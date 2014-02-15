@@ -1,4 +1,4 @@
-android.apps.chat
-=================
+android.chat
+============
 
-A sovereign chat app for android.
+A sovereign chat app.
