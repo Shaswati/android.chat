@@ -18,7 +18,7 @@ public class LoopingHandlerRunnable implements Runnable {
 	boolean stopped = false;
 	
 	// remove a crap
-	LoopingHandlerRunnable(Runnable inner, int interval) {
+	public LoopingHandlerRunnable(Runnable inner, int interval) {
 		this.handler = new Handler();
 		this.inner = inner;
 		this.interval = interval;

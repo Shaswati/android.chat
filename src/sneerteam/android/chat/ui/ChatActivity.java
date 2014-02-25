@@ -1,8 +1,10 @@
-package sneerteam.android.chat;
+package sneerteam.android.chat.ui;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import sneerteam.android.chat.Message;
+import sneerteam.android.chat.R;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;

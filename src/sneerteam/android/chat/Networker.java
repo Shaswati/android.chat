@@ -2,11 +2,9 @@ package sneerteam.android.chat;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
@@ -39,7 +37,7 @@ public class Networker implements Runnable {
 	// our UDP socket
 	DatagramChannel channel;
 	
-	Networker(NetworkerListener listener) throws IOException, UnknownHostException {
+	public Networker(NetworkerListener listener) throws IOException, UnknownHostException {
 		this.listener = listener;
 
 		// dynamic.sneer.me:55555
