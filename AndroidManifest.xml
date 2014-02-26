@@ -28,6 +28,10 @@
             android:name="sneerteam.android.chat.ui.ChatActivity"
             android:label="@string/title_activity_chat" >
         </activity>
-    </application>
+        <activity
+            android:name="sneerteam.android.chat.ui.PublicChatActivity"
+            android:label="@string/title_activity_chat" >
+        </activity>
+        </application>
 
 </manifest>

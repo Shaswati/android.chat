@@ -8,7 +8,7 @@ public class Contact {
 		this.nome = nome;
 	}
 	
-	public String getNome() {
+	public String getName() {
 		return nome;
 	}
 	

@@ -46,7 +46,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact>{
         }
         
         Contact contact = data.get(position);
-        holder.contactName.setText(contact.getNome());
+        holder.contactName.setText(contact.getName());
         
         return row;
     }

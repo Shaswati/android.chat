@@ -1,6 +1,7 @@
 package sneerteam.android.chat.ui;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,8 +61,9 @@ public class MainActivity extends Activity implements NetworkerListener {
         
         ListView listView = (ListView) findViewById(R.id.listView);
         listView.setOnItemClickListener(new OnItemClickListener() { @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        	Intent intent = new Intent(MainActivity.this, ChatActivity.class);
-            intent.putExtra("contact_seal", contacts().get(position).getNome());
+        	String name = contacts().get(position).getName();
+        	Intent intent = new Intent(MainActivity.this, name.equals("Public Chat Room") ? PublicChatActivity.class : ChatActivity.class);
+			intent.putExtra("contact_seal", name);
             startActivity (intent);
 		}});
         
@@ -79,7 +81,7 @@ public class MainActivity extends Activity implements NetworkerListener {
     		networker = new Networker(this);
     		// start networker with 100ms (good enough for chatting) poll 
     		//   on the UI thread
-    		loopingNetworker = new LoopingHandlerRunnable(networker, 100);
+//    		loopingNetworker = new LoopingHandlerRunnable(networker, 100);
     	} catch (IOException e) {
     		(( TextView )findViewById(R.id.textView1) ).setText("IOException: " + e);
     	}
@@ -91,7 +93,7 @@ public class MainActivity extends Activity implements NetworkerListener {
 		
 		// we will abuse the poller to send a packet once every second
 		spamskip++;
-		if (spamskip >= 10) { // 10 x 100ms = 1s
+		if (spamskip >= 100) { // 100 x 100ms = 10s
 			spamskip = 0;
 			// send a spam message to the server
 			networker.sendChat("Humpty Dumpty", "I just fell off of a wall. Ouch!");
@@ -103,7 +105,7 @@ public class MainActivity extends Activity implements NetworkerListener {
 	}
 
 	@Override
-	public void receivedPacket() {
+	public void receivedPacket(ByteBuffer ignored) {
 		receivecount++;
 		updateUI();
 	}
@@ -128,6 +130,8 @@ public class MainActivity extends Activity implements NetworkerListener {
     // Creates a contact list for the demo display
     private List<Contact> contacts() {
     	List<Contact> contacts = new ArrayList<Contact>();
+    	contacts.add(new Contact("Public Chat Room"
+    			));
     	contacts.add(new Contact("Altz"));
         contacts.add(new Contact("Rafa"));
         contacts.add(new Contact("Jao"));

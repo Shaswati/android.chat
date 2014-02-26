@@ -84,7 +84,8 @@ public class Networker implements Runnable {
 					break; // we're done -- no packets
 				} else {
 					// else we got one
-					listener.receivedPacket();
+					data.flip();
+					listener.receivedPacket(data);
 				
 					// 	FIXME: parse the packet, the EDN and call app with a sensible
 					//   bag of Java objects and a meaning (incoming chat msg, etc.)
@@ -92,6 +93,7 @@ public class Networker implements Runnable {
 				
 			} catch (IOException e) {
 				listener.error();
+				break;
 			}
 		}
 	}

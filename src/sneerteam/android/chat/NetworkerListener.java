@@ -1,5 +1,8 @@
 package sneerteam.android.chat;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
 /*
  * Callbacks from the Networker class.
  * 
@@ -12,7 +15,7 @@ public interface NetworkerListener {
 	public void polled();
 
 	// received a packet
-	public void receivedPacket();
+	public void receivedPacket(ByteBuffer data);
 	
 	// sent a packet
 	public void sentPacket();
