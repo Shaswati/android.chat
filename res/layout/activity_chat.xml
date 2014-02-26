@@ -2,11 +2,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="@drawable/chat_background"
     tools:context=".ChatActivity" >
 
-    <ListView 
-      android:id="@+id/listView" 
-      android:layout_height="fill_parent"
-      android:layout_width="fill_parent" />
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:stackFromBottom="true"
+		android:transcriptMode="normal"
+		android:divider="@null"
+		android:padding="10dp"
+        android:layout_above="@+id/sender" />
+
+    <LinearLayout
+        android:id="@+id/sender"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#DDDDDD"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="text" >
+        </EditText>
+
+        <Button
+            android:id="@+id/skipButton"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Send" >
+        </Button>
+    </LinearLayout>
 
 </RelativeLayout>
