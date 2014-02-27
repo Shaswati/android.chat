@@ -66,7 +66,7 @@ public class ChatClient {
 	}
 
 	public void send(String message) {
-		networker.sendChat("Annonymous " + System.getProperty("user.name"), message);
+		networker.sendChat("Dummy", message);
 	}
 
 	

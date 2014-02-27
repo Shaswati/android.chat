@@ -36,7 +36,8 @@
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Send" >
+            android:text="Send"
+            android:onClick="onSendButtonClick">
         </Button>
     </LinearLayout>
 

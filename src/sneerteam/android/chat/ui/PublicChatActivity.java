@@ -11,8 +11,10 @@ import sneerteam.android.chat.Networker;
 import sneerteam.android.chat.R;
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class PublicChatActivity extends Activity {
 	
@@ -51,5 +53,10 @@ public class PublicChatActivity extends Activity {
     	messages.add(new Message("Welcome to Public Chat"));
         return messages;
     }
+	
+	public void onSendButtonClick(View view) {
+		String whatusay = ((TextView)findViewById(R.id.editText)).getText().toString();
+		chat.send(whatusay);
+	}
 
 }
