@@ -35,7 +35,6 @@ public class PublicChatActivity extends Activity {
 			chat = new ChatClient(new ChatListener() { @Override public void on(Message msg) {
 				adapter.add(msg);
 			}});
-			chat.send("Whats happening?");
 		} catch (IOException e) {
 			adapter.add(new Message(e.getMessage()));
 		}

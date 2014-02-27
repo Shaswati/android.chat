@@ -54,8 +54,11 @@ public class Networker implements Runnable {
 		
 		// FIXME: maybe we should use our spiffy CMSMessage class, hmm? :) 
 		// FIXME: escape double quotes in the 'message' string.
-		String edn = "{:type :msg :contents \"" + message + "\"}";
-		
+		send("{:type :msg :contents \"" + message + "\" :sender \"" + sender + "\"}");
+	}
+
+	
+	public void send(String edn) {
 		byte[] sendData;
 		try {
 			sendData = edn.getBytes("UTF-8");

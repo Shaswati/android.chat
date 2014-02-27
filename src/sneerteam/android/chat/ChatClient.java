@@ -2,8 +2,8 @@ package sneerteam.android.chat;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.Map;
 
 public class ChatClient {
 
@@ -15,6 +15,8 @@ public class ChatClient {
 		listener = chatListener;
 		networker = createNetworker();
 		loopingNetworker = new LoopingHandlerRunnable(networker, 100);
+		
+		networker.send("{:type :whats-up}");
 	}
 
 	private Networker createNetworker() throws IOException {
@@ -24,21 +26,24 @@ public class ChatClient {
 			@Override
 			public void sentPacket() {
 				// TODO Auto-generated method stub
-				
 			}
 			
 			@Override
 			public void receivedPacket(ByteBuffer packet) {
-				listener.on(new Message("Message..."));
 				byte[] bytes = new byte[packet.remaining()];
 				packet.get(bytes);
-				Message msg;
+				CMSMessage msg;
 				try {
-					msg = new Message(new String(bytes, "UTF-8"));
+					msg = new CMSMessage(new String(bytes, "UTF-8"));
 				} catch (UnsupportedEncodingException e) {
 					throw new IllegalStateException();
 				}
-				listener.on(msg);
+				Map<String, Object> values = msg.getJavaMap();
+				Object type = values.get("type");
+				//if (!":msg".equals(type)) return;
+						if (values.get("contents") == null) return;
+				
+				listener.on(new Message("" + values.get("sender") + ": " + values.get("contents")));
 				
 			}
 			
@@ -61,7 +66,7 @@ public class ChatClient {
 	}
 
 	public void send(String message) {
-		networker.sendChat("Annonymous", message);
+		networker.sendChat("Annonymous " + System.getProperty("user.name"), message);
 	}
 
 	
