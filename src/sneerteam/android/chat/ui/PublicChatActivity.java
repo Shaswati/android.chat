@@ -2,12 +2,12 @@ package sneerteam.android.chat.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import sneerteam.android.chat.ChatClient;
 import sneerteam.android.chat.ChatListener;
 import sneerteam.android.chat.Message;
-import sneerteam.android.chat.Networker;
 import sneerteam.android.chat.R;
 import android.app.Activity;
 import android.os.Bundle;
@@ -20,6 +20,8 @@ public class PublicChatActivity extends Activity {
 	
 	String contactSeal;
 	private ChatClient chat;
+	
+	List<Message> myMessages = messages();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,15 +32,19 @@ public class PublicChatActivity extends Activity {
 		setTitle("Conversa com " + contactSeal);
 		
 		ListView listView = (ListView) findViewById(R.id.listView);
-		final ArrayAdapter<Message> adapter = new ArrayAdapter<Message>(this, android.R.layout.simple_list_item_1, messages());
+		final ArrayAdapter<Message> adapter = new ArrayAdapter<Message>(this, android.R.layout.simple_list_item_1, myMessages);
         listView.setAdapter(adapter);
         
         try {
 			chat = new ChatClient(new ChatListener() { @Override public void on(Message msg) {
-				adapter.add(msg);
+				if (Collections.binarySearch(myMessages, msg) < 0) {
+					myMessages.add(msg);
+					Collections.sort(myMessages);
+					adapter.notifyDataSetChanged();
+				}
 			}});
 		} catch (IOException e) {
-			adapter.add(new Message(e.getMessage()));
+			adapter.add(new Message(System.currentTimeMillis(), "<ERROR>", e.getMessage()));
 		}
 	}
 	
@@ -50,7 +56,7 @@ public class PublicChatActivity extends Activity {
 	
 	private List<Message> messages() {
     	List<Message> messages = new ArrayList<Message>();
-    	messages.add(new Message("Welcome to Public Chat"));
+    	messages.add(new Message(System.currentTimeMillis(), "Sneer", "Welcome to Public Chat"));
         return messages;
     }
 	

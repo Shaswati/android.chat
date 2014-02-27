@@ -28,9 +28,9 @@ public class ChatActivity extends Activity {
 	
 	private List<Message> messages() {
     	List<Message> messages = new ArrayList<Message>();
-    	messages.add(new Message("Ola!"));
-        messages.add(new Message("Tudo bom?"));
-        messages.add(new Message("Tudo, e voce?"));
+    	messages.add(new Message(0, "Eu", "Ola!"));
+        messages.add(new Message(1, "ze", "Tudo bom?"));
+        messages.add(new Message(2, "jose", "Tudo, e voce?"));
         return messages;
     }
 

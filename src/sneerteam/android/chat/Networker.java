@@ -37,6 +37,9 @@ public class Networker implements Runnable {
 	// our UDP socket
 	DatagramChannel channel;
 	
+	// last time we sent a refresh 
+	long lastRefreshTime = 0;
+	
 	public Networker(NetworkerListener listener) throws IOException, UnknownHostException {
 		this.listener = listener;
 
@@ -73,6 +76,14 @@ public class Networker implements Runnable {
 	
 	// invoke this periodically using the UI thread (no multithreading support)
 	public void run() {
+		
+		long now = System.currentTimeMillis();
+		
+		// compute 1 minute interval & send a refresh to the server as a ping thing
+		if (now > lastRefreshTime + 60000) {
+			lastRefreshTime = now;
+			send("{:type :refresh}");
+		}
 		
 		// we just polled the network
 		listener.polled();

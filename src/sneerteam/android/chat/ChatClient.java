@@ -15,8 +15,6 @@ public class ChatClient {
 		listener = chatListener;
 		networker = createNetworker();
 		loopingNetworker = new LoopingHandlerRunnable(networker, 100);
-		
-		networker.send("{:type :whats-up}");
 	}
 
 	private Networker createNetworker() throws IOException {
@@ -38,13 +36,30 @@ public class ChatClient {
 				} catch (UnsupportedEncodingException e) {
 					throw new IllegalStateException();
 				}
+				
+				// If we fall off this method without doing anything it means
+				//   the message is junk and we are just ignoring it.
+				
 				Map<String, Object> values = msg.getJavaMap();
+				
 				Object type = values.get("type");
-				//if (!":msg".equals(type)) return;
-						if (values.get("contents") == null) return;
+				Object sender = values.get("sender");
+				Object contents = values.get("contents");
+				Object timestamp = values.get("timestamp");
 				
-				listener.on(new Message("" + values.get("sender") + ": " + values.get("contents")));
-				
+				// Validate the only message we get from the server so far.
+				// When we get to receiving multiple types of messages this
+				//   will be broken up.
+				//
+				if ((type != null) && (type.toString().equals(":msg")) 
+						&& (sender != null) && (contents != null) && (timestamp != null)
+						&& (timestamp instanceof Long)) 
+				{
+					listener.on(new Message((Long)timestamp, sender.toString(), contents.toString()));
+				} else {
+					// debug (pode remover)
+					listener.on(new Message(System.currentTimeMillis(), "<ERROR>", "<Mensagem descartada>: " + msg.getEDNString()));
+				}
 			}
 			
 			@Override
