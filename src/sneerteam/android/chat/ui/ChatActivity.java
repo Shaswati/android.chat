@@ -7,7 +7,6 @@ import sneerteam.android.chat.Message;
 import sneerteam.android.chat.R;
 import android.app.Activity;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 public class ChatActivity extends Activity {
@@ -23,7 +22,7 @@ public class ChatActivity extends Activity {
 		setTitle("Conversa com " + contactSeal);
 		
 		ListView listView = (ListView) findViewById(R.id.listView);
-		ArrayAdapter<Message> adapter = new ArrayAdapter<Message>(this, android.R.layout.simple_list_item_1, messages());
+		ChatAdapter adapter = new ChatAdapter(this, R.layout.list_item_user_message, R.layout.list_item_contact_message, messages());
         listView.setAdapter(adapter);
 	}
 	
