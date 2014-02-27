@@ -60,7 +60,7 @@ class CMSMessage {
 		}
 		return javaMap;
 	}
-		
+	
 	/*
 	 * Parse EDN String into Java map
 	 */
@@ -81,9 +81,11 @@ class CMSMessage {
 		//
 		// works if we take out the quotation problem
 		//Pattern p = Pattern.compile("(:\\S+)\\s+(\\S+)");
-		//
 		// works: 
-		Pattern p = Pattern.compile("(:\\S+)\\s+(\"[^\"]*\"|\\S+)");
+		//Pattern p = Pattern.compile("(:\\S+)\\s+(\"[^\"]*\"|\\S+)");
+		// how java excludes from char classes:  [a-z&&[^bc]]
+		// commas become whitespace for us when not quoted:
+		Pattern p = Pattern.compile("(:[\\S&&[^,]]+)[\\s,]+(\"[^\"]*\"|[\\S&&[^,]]+)");
         Matcher m = p.matcher(edn);
         
         while(m.find()) {
@@ -184,7 +186,7 @@ class CMSMessage {
 	 * Run example
 	 */
 	public static void runExample() {
-		String origedn = "{:key val :key2 val2 :key2p5 :valueiskeyword :key3str \"minha string 44994haha--++== poiM\" :key4 +444567 :key42 -444567 :key43 444567 :keyfloat -123.543 :aa bb}";
+		String origedn = "{:key val, :key2 val2, :key2p5 :valueiskeyword, :key3str \"minha string,,, 4,4,9,9,4,h,,a , , ,ha--++== poiM\", :key4 +444567, :key42 -444567, :key43 444567, :keyfloat -123.543, :aa bb}";
 		System.out.println("Starting with EDN string:\n" + origedn + "\n");
 		CMSMessage msg = new CMSMessage(origedn);
 		System.out.println("Dumping given EDN string in java map form:");
