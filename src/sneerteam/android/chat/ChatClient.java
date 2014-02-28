@@ -14,7 +14,7 @@ public class ChatClient {
 	public ChatClient(ChatListener chatListener) throws IOException {
 		listener = chatListener;
 		networker = createNetworker();
-//		loopingNetworker = new LoopingHandlerRunnable(networker, 100);
+		loopingNetworker = new LoopingHandlerRunnable(networker, 100);
 	}
 
 	private Networker createNetworker() throws IOException {
@@ -81,9 +81,7 @@ public class ChatClient {
 	}
 
 	public void send(String sender, String message) {
-//		networker.sendChat(sender, message);
-		
-		listener.on(new Message(System.currentTimeMillis(), sender, message));
+		networker.sendChat(sender, message);
 	}
 
 	
