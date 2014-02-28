@@ -31,39 +31,22 @@ public class ChatAdapter extends ArrayAdapter<Message>{
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
-        MessageHolder holder = null;
         
         Message message = data.get(position);
-        if(row == null)
-        {
-            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-            if (message.toString().contains("wewewe"))
-            	message.toString();
-            if (sender != null && sender.equals(message.sender()))
-            	row = inflater.inflate(layoutUserResourceId, parent, false);
-            else
-            	row = inflater.inflate(listContactResourceId, parent, false);
-            
-            holder = new MessageHolder();
-            holder.messageText = (TextView)row.findViewById(R.id.messageText);
-            
-            row.setTag(holder);
-        }
-        else
-        {
-            holder = (MessageHolder)row.getTag();
-        }
         
-        holder.messageText.setText(message.toString());
+        LayoutInflater inflater = ((Activity)context).getLayoutInflater();
+        if (sender != null && sender.equals(message.sender()))
+        	row = inflater.inflate(layoutUserResourceId, parent, false);
+        else
+        	row = inflater.inflate(listContactResourceId, parent, false);
+        
+        TextView messageText = (TextView)row.findViewById(R.id.messageText);
+        
+        messageText.setText(message.toString());
         
         return row;
     }
     
-    static class MessageHolder
-    {
-        TextView messageText;
-    }
-
 	public boolean hasSender() {
 		return sender != null;
 	}
