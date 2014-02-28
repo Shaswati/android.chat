@@ -1,5 +1,6 @@
 package sneerteam.android.chat;
 
+import android.annotation.SuppressLint;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -19,11 +20,15 @@ public class Message implements Comparable<Message> {
 	public String sender() {
 		return sender;
 	}
-
-	@Override public String toString() {
+	
+	public String content() {
+		return content;
+	}
+	
+	@SuppressLint("SimpleDateFormat")
+	public String time() {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM HH:mm");
-		String datestr = sdf.format(new Date(timestamp));
-		return datestr + " " + sender + ": " + content;
+		return sdf.format(new Date(timestamp));
 	}
 
 	@Override

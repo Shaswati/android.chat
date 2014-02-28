@@ -1,26 +1,55 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:padding="10dp"
     android:gravity="right">
     
     <View
-		android:id="@+id/SpeechBubbleArrowRight"
+		android:id="@+id/speechBubbleArrowRight"
 		android:layout_width="30dp"
 		android:layout_height="20dp"
 		android:layout_marginLeft="-30dp"
-		android:layout_alignBottom="@+id/messageText"
-		android:layout_toRightOf="@+id/messageText"
+		android:layout_alignBottom="@+id/speechBubble"
+		android:layout_toRightOf="@+id/speechBubble"
 		android:background="@drawable/message_arrow_right" />
     
-	<TextView
-		android:id="@+id/messageText"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:background="@drawable/user_speech_bubble"
-		android:padding="5dp"
-		android:paddingBottom="20dp"
-		android:layout_marginRight="15dp"
-		android:text="@string/dummyText" />
     
+    <RelativeLayout
+        android:id="@+id/speechBubble"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:padding="10dp"
+	    android:layout_marginRight="15dp"
+	    android:layout_alignParentRight="true"
+	    android:gravity="right"
+	    android:background="@drawable/user_speech_bubble">
+	
+		<TextView
+			android:id="@+id/messageSender"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignLeft="@+id/messageContent"
+			android:textStyle="bold"
+			android:textColor="#D34F39"
+			android:text="Alts" />
+	
+		<TextView
+			android:id="@+id/messageContent" 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/messageSender"
+			android:text="@string/dummyText" />
+		
+		<TextView
+			android:id="@+id/messageTime"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/messageContent"
+			android:layout_alignLeft="@+id/messageContent"
+			android:textSize="12sp"
+			android:textColor="#777"
+			android:text="13:00" />
+	
+	</RelativeLayout>
+	 
 </RelativeLayout> 

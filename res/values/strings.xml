@@ -4,6 +4,6 @@
     <string name="app_name">Sneer Chat</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_chat">Conversa</string>
-    <string name="dummyText">Dummy dummy dummy dummy dummy dummy dummy dummy dummy dummy dummy dummy dummy dummy dummy dummy dummy</string>
+    <string name="dummyText">Dummy dummy</string>
 
 </resources>

@@ -9,17 +9,45 @@
 		android:layout_width="30dp"
 		android:layout_height="20dp"
 		android:layout_marginRight="-15dp"
-		android:layout_alignTop="@+id/messageText"
+		android:layout_alignTop="@+id/speechBubble"
 		android:background="@drawable/message_arrow_left" />
     
-	<TextView
-		android:id="@+id/messageText"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:background="@drawable/contact_speech_bubble"
-		android:padding="5dp" 
-		android:paddingBottom="20dp"
-		android:layout_toRightOf="@+id/SpeechBubbleArrowLeft"
-		android:text="@string/dummyText" />
+	<RelativeLayout
+        android:id="@+id/speechBubble"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:padding="10dp"
+	    android:layout_marginRight="15dp"
+	    android:layout_toRightOf="@+id/SpeechBubbleArrowLeft"
+	    android:gravity="right"
+	    android:background="@drawable/contact_speech_bubble">
+	
+		<TextView
+			android:id="@+id/messageSender"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignLeft="@+id/messageContent"
+			android:textStyle="bold"
+			android:textColor="#383"
+			android:text="Alts" />
+	
+		<TextView
+			android:id="@+id/messageContent" 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/messageSender"
+			android:text="@string/dummyText" />
+		
+		<TextView
+			android:id="@+id/messageTime"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/messageContent"
+			android:layout_alignLeft="@+id/messageContent"
+			android:textSize="12sp"
+			android:textColor="#777"
+			android:text="13:00" />
+	
+	</RelativeLayout>
     
 </RelativeLayout>

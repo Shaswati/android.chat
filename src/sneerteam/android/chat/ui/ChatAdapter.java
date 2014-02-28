@@ -1,11 +1,13 @@
 package sneerteam.android.chat.ui;
 
 import java.util.List;
+import java.util.Random;
 
 import sneerteam.android.chat.Message;
 import sneerteam.android.chat.R;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,17 +37,26 @@ public class ChatAdapter extends ArrayAdapter<Message>{
         Message message = data.get(position);
         
         LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-        if (sender != null && sender.equals(message.sender()))
+        if (isMine(message))
         	row = inflater.inflate(layoutUserResourceId, parent, false);
         else
         	row = inflater.inflate(listContactResourceId, parent, false);
         
-        TextView messageText = (TextView)row.findViewById(R.id.messageText);
+        TextView messageContent = (TextView)row.findViewById(R.id.messageContent);
+        TextView messageSender = (TextView)row.findViewById(R.id.messageSender);
+        TextView messageTime = (TextView)row.findViewById(R.id.messageTime);
         
-        messageText.setText(message.toString());
+        messageContent.setText(message.content());
+        messageSender.setText(message.sender());
+        if (!isMine(message)) messageSender.setTextColor(pastelColorDeterminedBy(message.sender()));
+        messageTime.setText(message.time());
         
         return row;
     }
+
+	private boolean isMine(Message message) {
+		return sender != null && sender.equals(message.sender());
+	}
     
 	public boolean hasSender() {
 		return sender != null;
@@ -53,5 +64,13 @@ public class ChatAdapter extends ArrayAdapter<Message>{
 
 	public void setSender(String sender) {
 		this.sender = sender;
+	}
+	
+	private static int pastelColorDeterminedBy(String string) {
+		Random random = new Random(string.hashCode() * 713);
+		int r = 50 + random.nextInt(106);
+		int g = 50 + random.nextInt(106);
+		int b = 50 + random.nextInt(106);
+		return Color.argb(255, r, g, b);
 	}
 }
