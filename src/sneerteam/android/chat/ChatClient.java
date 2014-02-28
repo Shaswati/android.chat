@@ -80,8 +80,8 @@ public class ChatClient {
 		loopingNetworker.stop();
 	}
 
-	public void send(String message) {
-		networker.sendChat("Dummy", message);
+	public void send(String sender, String message) {
+		networker.sendChat(sender, message);
 	}
 
 	
