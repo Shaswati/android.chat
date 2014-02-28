@@ -13,8 +13,12 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -45,12 +49,17 @@ public class PublicChatActivity extends Activity {
     		StrictMode.setThreadPolicy(policy);
     	}
         
+        myNick = preferences().getString("myNick", "");
+        Log.i("Tots", "asdf");
+        Log.i("Tots", myNick);
+        
 		setContentView(R.layout.activity_chat);
 		
 		setTitle("Public Chat");
 		
 		ListView listView = (ListView) findViewById(R.id.listView);
 		chatAdapter = new ChatAdapter(this, R.layout.list_item_user_message, R.layout.list_item_contact_message, myMessages);
+		chatAdapter.setSender(myNick);
         listView.setAdapter(chatAdapter);
         
         try {
@@ -65,7 +74,7 @@ public class PublicChatActivity extends Activity {
 			chatAdapter.add(new Message(System.currentTimeMillis(), "<ERROR>", e.getMessage()));
 		}
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		if (chat != null) chat.destroy();
@@ -95,6 +104,9 @@ public class PublicChatActivity extends Activity {
 		    .setView(input)
 		    .setPositiveButton("OK", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int whichButton) {
 	        	myNick = input.getText().toString();
+	        	Editor editor = preferences().edit();
+				editor.putString("myNick", myNick);
+	        	editor.commit();
 	        	chatAdapter.setSender(myNick);
 	        	sendText();
 		    }}).show();
@@ -105,6 +117,10 @@ public class PublicChatActivity extends Activity {
 		String whatusay = widget.getText().toString();
 		widget.setText("");
 		chat.send(myNick, whatusay);
+	}
+	
+	private SharedPreferences preferences() {
+		return PreferenceManager.getDefaultSharedPreferences(this);
 	}
 
 }
