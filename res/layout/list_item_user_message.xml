@@ -1,15 +1,25 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:gravity="right">
     
-    <TextView
-        android:id="@+id/messageText"
-        android:text="@string/dummyText"
-        android:background="#F6D7D6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="10dp" />
+    <View
+		android:id="@+id/SpeechBubbleArrowRight"
+		android:layout_width="30dp"
+		android:layout_height="20dp"
+		android:layout_marginLeft="-15dp"
+		android:layout_toRightOf="@+id/messageText"
+		android:layout_alignBottom="@+id/messageText"
+		android:background="@drawable/message_arrow_right" />
     
-</RelativeLayout>
+	<TextView
+		android:id="@+id/messageText"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:background="@drawable/user_speech_bubble"
+		android:padding="5dp" 
+		android:paddingBottom="20dp"
+		android:text="@string/dummyText" />
+    
+</RelativeLayout> 
