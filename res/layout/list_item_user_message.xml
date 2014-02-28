@@ -8,9 +8,9 @@
 		android:id="@+id/SpeechBubbleArrowRight"
 		android:layout_width="30dp"
 		android:layout_height="20dp"
-		android:layout_marginLeft="-15dp"
-		android:layout_toRightOf="@+id/messageText"
+		android:layout_marginLeft="-30dp"
 		android:layout_alignBottom="@+id/messageText"
+		android:layout_toRightOf="@+id/messageText"
 		android:background="@drawable/message_arrow_right" />
     
 	<TextView
@@ -18,8 +18,9 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:background="@drawable/user_speech_bubble"
-		android:padding="5dp" 
+		android:padding="5dp"
 		android:paddingBottom="20dp"
+		android:layout_marginRight="15dp"
 		android:text="@string/dummyText" />
     
 </RelativeLayout> 
