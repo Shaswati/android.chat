@@ -1,6 +1,5 @@
 package sneerteam.android.chat;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /*

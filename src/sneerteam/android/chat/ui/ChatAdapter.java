@@ -18,6 +18,7 @@ public class ChatAdapter extends ArrayAdapter<Message>{
     int layoutUserResourceId;    
     int listContactResourceId;
     List<Message> data = null;
+	private String sender;
     
     public ChatAdapter(Context context, int layoutUserResourceId, int listContactResourceId, List<Message> data) {
         super(context, layoutUserResourceId, data);
@@ -30,34 +31,44 @@ public class ChatAdapter extends ArrayAdapter<Message>{
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
-        ContactHolder holder = null;
+        MessageHolder holder = null;
         
+        Message message = data.get(position);
         if(row == null)
         {
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-            if (position%2 == 0)
+            if (message.toString().contains("wewewe"))
+            	message.toString();
+            if (sender != null && sender.equals(message.sender()))
             	row = inflater.inflate(layoutUserResourceId, parent, false);
             else
             	row = inflater.inflate(listContactResourceId, parent, false);
             
-            holder = new ContactHolder();
+            holder = new MessageHolder();
             holder.messageText = (TextView)row.findViewById(R.id.messageText);
             
             row.setTag(holder);
         }
         else
         {
-            holder = (ContactHolder)row.getTag();
+            holder = (MessageHolder)row.getTag();
         }
         
-        Message message = data.get(position);
         holder.messageText.setText(message.toString());
         
         return row;
     }
     
-    static class ContactHolder
+    static class MessageHolder
     {
         TextView messageText;
     }
+
+	public boolean hasSender() {
+		return sender != null;
+	}
+
+	public void setSender(String sender) {
+		this.sender = sender;
+	}
 }

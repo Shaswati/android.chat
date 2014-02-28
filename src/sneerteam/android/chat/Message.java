@@ -1,6 +1,5 @@
 package sneerteam.android.chat;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -8,6 +7,7 @@ public class Message implements Comparable<Message> {
 	
 	private String content;
 	private String sender;
+	
 	private long timestamp;
 	
 	public Message(long timestamp, String sender, String content) {
@@ -15,9 +15,13 @@ public class Message implements Comparable<Message> {
 		this.sender = sender;
 		this.content = content;
 	}
-	
+
+	public String sender() {
+		return sender;
+	}
+
 	@Override public String toString() {
-		SimpleDateFormat sdf = new SimpleDateFormat("[dd/MMM HH:mm]");
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM HH:mm");
 		String datestr = sdf.format(new Date(timestamp));
 		return datestr + " " + sender + ": " + content;
 	}

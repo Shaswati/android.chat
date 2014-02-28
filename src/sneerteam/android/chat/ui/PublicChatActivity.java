@@ -9,6 +9,7 @@ import sneerteam.android.chat.ChatClient;
 import sneerteam.android.chat.ChatListener;
 import sneerteam.android.chat.Message;
 import sneerteam.android.chat.R;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -25,7 +26,9 @@ public class PublicChatActivity extends Activity {
 	private String myNick = null;
 	
 	List<Message> myMessages = messages();
+	private ChatAdapter chatAdapter;
 
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -47,19 +50,19 @@ public class PublicChatActivity extends Activity {
 		setTitle("Public Chat");
 		
 		ListView listView = (ListView) findViewById(R.id.listView);
-        final ChatAdapter adapter = new ChatAdapter(this, R.layout.list_item_user_message, R.layout.list_item_contact_message, myMessages);
-        listView.setAdapter(adapter);
+		chatAdapter = new ChatAdapter(this, R.layout.list_item_user_message, R.layout.list_item_contact_message, myMessages);
+        listView.setAdapter(chatAdapter);
         
         try {
 			chat = new ChatClient(new ChatListener() { @Override public void on(Message msg) {
 				if (Collections.binarySearch(myMessages, msg) < 0) {
 					myMessages.add(msg);
 					Collections.sort(myMessages);
-					adapter.notifyDataSetChanged();
+					chatAdapter.notifyDataSetChanged();
 				}
 			}});
 		} catch (IOException e) {
-			adapter.add(new Message(System.currentTimeMillis(), "<ERROR>", e.getMessage()));
+			chatAdapter.add(new Message(System.currentTimeMillis(), "<ERROR>", e.getMessage()));
 		}
 	}
 	
@@ -71,12 +74,12 @@ public class PublicChatActivity extends Activity {
 	
 	private List<Message> messages() {
     	List<Message> messages = new ArrayList<Message>();
-    	messages.add(new Message(System.currentTimeMillis(), "Sneer", "Welcome to Public Chat"));
+    	messages.add(new Message(0, "Sneer", "Welcome to Public Chat"));
         return messages;
     }
 	
 	public void onSendButtonClick(View view) {
-		if (myNick == null)
+		if (!chatAdapter.hasSender())
 			tryToGetMyNick();
 		else
 			sendText();
@@ -87,17 +90,20 @@ public class PublicChatActivity extends Activity {
 		input.setSingleLine();
 		
 		new AlertDialog.Builder(this)
-		    .setTitle("Update Status")
-		    .setMessage("Nick:")
+		    .setTitle("Nome")
+		    .setMessage("Digite seu nome e sobrenome ou um nick que as pessoas conheçam, por favor. (Nao '1234', 'aaa', 'qwerty') :)")
 		    .setView(input)
-		    .setPositiveButton("Ok", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int whichButton) {
+		    .setPositiveButton("OK", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int whichButton) {
 	        	myNick = input.getText().toString();
+	        	chatAdapter.setSender(myNick);
 	        	sendText();
 		    }}).show();
 	}
 	
 	private void sendText() {
-		String whatusay = ((TextView)findViewById(R.id.editText)).getText().toString();
+		TextView widget = (TextView)findViewById(R.id.editText);
+		String whatusay = widget.getText().toString();
+		widget.setText("");
 		chat.send(myNick, whatusay);
 	}
 
