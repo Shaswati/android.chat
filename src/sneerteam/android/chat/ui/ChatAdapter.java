@@ -5,6 +5,7 @@ import java.util.Random;
 
 import sneerteam.android.chat.Message;
 import sneerteam.android.chat.R;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -33,7 +34,8 @@ public class ChatAdapter extends ArrayAdapter<Message>{
         this.data = data;
     }
 
-    @Override
+    @SuppressLint("NewApi")
+	@Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         
@@ -46,7 +48,7 @@ public class ChatAdapter extends ArrayAdapter<Message>{
         	row = inflater.inflate(listContactResourceId, parent, false);
         
         RelativeLayout speechBubble = (RelativeLayout)row.findViewById(R.id.speechBubble);
-//        View speechBubbleArrowLeft = (View)row.findViewById(R.id.speechBubbleArrowLeft);
+        View speechBubbleArrowLeft = (View)row.findViewById(R.id.speechBubbleArrowLeft);
         TextView messageContent = (TextView)row.findViewById(R.id.messageContent);
         TextView messageSender = (TextView)row.findViewById(R.id.messageSender);
         TextView messageTime = (TextView)row.findViewById(R.id.messageTime);
@@ -56,6 +58,7 @@ public class ChatAdapter extends ArrayAdapter<Message>{
         if (!isMine(message)) {
         	messageSender.setTextColor(darkColorDeterminedBy(message.sender()));
         	
+        	speechBubbleArrowLeft.setBackground(new TriangleDrawable(darkColorDeterminedBy(message.sender())));
 //        	LayerDrawable bubbleArrowLayer = (LayerDrawable) speechBubbleArrowLeft.getBackground();
 //        	RotateDrawable bubbleArrowRotate = (RotateDrawable) bubbleArrowLayer.findDrawableByLayerId(R.id.bubbleArrow);
 //        	GradientDrawable x = (GradientDrawable) getContext().getResources().getDrawable(R.id.bubbleArrow);
