@@ -7,7 +7,6 @@ import sneerteam.android.chat.Message;
 import sneerteam.android.chat.R;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -59,6 +58,8 @@ public class ChatAdapter extends ArrayAdapter<Message>{
         	
 //        	LayerDrawable bubbleArrowLayer = (LayerDrawable) speechBubbleArrowLeft.getBackground();
 //        	RotateDrawable bubbleArrowRotate = (RotateDrawable) bubbleArrowLayer.findDrawableByLayerId(R.id.bubbleArrow);
+//        	GradientDrawable x = (GradientDrawable) getContext().getResources().getDrawable(R.id.bubbleArrow);
+//        	x.setColor(darkColorDeterminedBy(message.sender()));
         	
         	LayerDrawable bubbleLayer = (LayerDrawable) speechBubble.getBackground();
         	GradientDrawable bubbleBackground = (GradientDrawable) bubbleLayer.findDrawableByLayerId(R.id.bubbleBackground);
