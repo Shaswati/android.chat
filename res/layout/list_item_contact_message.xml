@@ -17,7 +17,7 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:padding="10dp"
-	    android:layout_marginRight="15dp"
+	    android:layout_marginRight="50dp"
 	    android:layout_toRightOf="@+id/speechBubbleArrowLeft"
 	    android:gravity="right"
 	    android:background="@drawable/contact_speech_bubble">
