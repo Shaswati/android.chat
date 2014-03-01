@@ -3,6 +3,7 @@ package sneerteam.android.chat;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.Date;
 import java.util.Map;
 
 public class ChatClient {
@@ -58,7 +59,8 @@ public class ChatClient {
 					listener.on(new Message((Long)timestamp, sender.toString(), contents.toString()));
 				} else {
 					// debug (pode remover)
-					listener.on(new Message(System.currentTimeMillis(), "<ERROR>", "<Mensagem descartada>: " + msg.getEDNString()));
+					//listener.on(new Message(System.currentTimeMillis(), "<ERROR>", "<Mensagem descartada>: " + msg.getEDNString()));
+					System.out.println("" + new Date() + " Message discarded: " + msg.getEDNString());
 				}
 			}
 			
