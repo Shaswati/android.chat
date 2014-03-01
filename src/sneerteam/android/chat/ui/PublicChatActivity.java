@@ -26,10 +26,11 @@ import android.widget.TextView;
 
 public class PublicChatActivity extends Activity {
 	
+	private static List<Message> MESSAGES = initMessages();
+
 	private ChatClient chat;
 	private String myNick = null;
 	
-	List<Message> myMessages = messages();
 	private ChatAdapter chatAdapter;
 
 	@SuppressLint("NewApi")
@@ -49,24 +50,22 @@ public class PublicChatActivity extends Activity {
     		StrictMode.setThreadPolicy(policy);
     	}
         
-        myNick = preferences().getString("myNick", "");
-        Log.i("Tots", "asdf");
-        Log.i("Tots", myNick);
+        myNick = preferences().getString("myNick", null);
         
 		setContentView(R.layout.activity_chat);
 		
 		setTitle("Public Chat");
 		
 		ListView listView = (ListView) findViewById(R.id.listView);
-		chatAdapter = new ChatAdapter(this, R.layout.list_item_user_message, R.layout.list_item_contact_message, myMessages);
+		chatAdapter = new ChatAdapter(this, R.layout.list_item_user_message, R.layout.list_item_contact_message, MESSAGES);
 		chatAdapter.setSender(myNick);
         listView.setAdapter(chatAdapter);
         
         try {
 			chat = new ChatClient(new ChatListener() { @Override public void on(Message msg) {
-				if (Collections.binarySearch(myMessages, msg) < 0) {
-					myMessages.add(msg);
-					Collections.sort(myMessages);
+				if (Collections.binarySearch(MESSAGES, msg) < 0) {
+					MESSAGES.add(msg);
+					Collections.sort(MESSAGES);
 					chatAdapter.notifyDataSetChanged();
 				}
 			}});
@@ -81,9 +80,9 @@ public class PublicChatActivity extends Activity {
 		super.onDestroy();
 	}
 	
-	private List<Message> messages() {
+	private static List<Message> initMessages() {
     	List<Message> messages = new ArrayList<Message>();
-    	messages.add(new Message(0, "Sneer", "Welcome to Public Chat"));
+    	messages.add(new Message(0, "Sneer", "Welcome to the public chat room. Be awesome."));
         return messages;
     }
 	
@@ -99,8 +98,8 @@ public class PublicChatActivity extends Activity {
 		input.setSingleLine();
 		
 		new AlertDialog.Builder(this)
-		    .setTitle("Nome")
-		    .setMessage("Digite seu nome e sobrenome ou um nick que as pessoas conheçam, por favor. (Nao '1234', 'aaa', 'qwerty') :)")
+		    .setTitle("Name")
+		    .setMessage("Enter your full name or a nice nick that people will know.")
 		    .setView(input)
 		    .setPositiveButton("OK", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int whichButton) {
 	        	myNick = input.getText().toString();

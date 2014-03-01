@@ -77,11 +77,11 @@ public class ChatAdapter extends ArrayAdapter<Message>{
     }
 
 	private boolean isMine(Message message) {
-		return sender != "" && sender.equals(message.sender());
+		return sender != null && sender.equals(message.sender());
 	}
     
 	public boolean hasSender() {
-		return sender != "";
+		return sender != null;
 	}
 
 	public void setSender(String sender) {
