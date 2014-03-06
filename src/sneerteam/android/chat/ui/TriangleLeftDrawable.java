@@ -18,5 +18,5 @@ public class TriangleLeftDrawable extends TriangleDrawable {
 		
 		canvas.drawPath(path, paint);
 	}
-
+	
 } 
