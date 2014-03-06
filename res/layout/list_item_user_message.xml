@@ -6,22 +6,19 @@
     
     <View
 		android:id="@+id/speechBubbleArrowRight"
-		android:layout_width="30dp"
+		android:layout_width="20dp"
 		android:layout_height="20dp"
-		android:layout_marginLeft="-30dp"
+		android:layout_alignParentRight="true"
 		android:layout_alignBottom="@+id/speechBubble"
-		android:layout_toRightOf="@+id/speechBubble"
-		android:background="@drawable/message_arrow_right" />
+		android:background="@drawable/drawble_dummy" />
     
     
     <RelativeLayout
         android:id="@+id/speechBubble"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
+	    android:layout_toLeftOf="@+id/speechBubbleArrowRight"
 	    android:padding="10dp"
-	    android:layout_marginRight="15dp"
-	    android:layout_alignParentRight="true"
-	    android:gravity="right"
 	    android:background="@drawable/user_speech_bubble">
 	
 		<TextView
@@ -31,7 +28,7 @@
 			android:layout_alignLeft="@+id/messageContent"
 			android:textStyle="bold"
 			android:textColor="#D34F39"
-			android:text="Alts" />
+			android:text="@string/dummyText" />
 	
 		<TextView
 			android:id="@+id/messageContent" 
@@ -48,7 +45,7 @@
 			android:layout_alignLeft="@+id/messageContent"
 			android:textSize="12sp"
 			android:textColor="#777"
-			android:text="13:00" />
+			android:text="@string/dummyText" />
 	
 	</RelativeLayout>
 	 
