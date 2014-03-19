@@ -156,9 +156,10 @@ public class PublicChatActivity extends Activity {
 	}
 	
 	void onMessage(Message msg) {
-		if (Collections.binarySearch(MESSAGES, msg) < 0) {
-			MESSAGES.add(msg);
-			Collections.sort(MESSAGES);
+		int insertionPointHint = Collections.binarySearch(MESSAGES, msg);
+		if (insertionPointHint < 0) {
+			int insertionPoint = Math.abs(insertionPointHint) - 1;
+			MESSAGES.add(insertionPoint, msg);
 			chatAdapter.notifyDataSetChanged();
 		}
 	}
