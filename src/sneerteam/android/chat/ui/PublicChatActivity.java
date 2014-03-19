@@ -61,10 +61,13 @@ public class PublicChatActivity extends Activity {
 	
 	final ISubscriber subscriber = new ISubscriber.Stub() {
 		@Override
-		public void on(Uri path, Bundle value) throws RemoteException {
-			long timestamp = value.getLong("timestamp");
-			String sender = value.getString("sender");
-			String contents = value.getString("contents");
+		public void on(Uri path, Bundle bundle) throws RemoteException {
+			
+			Bundle value = bundle.getBundle(":value");
+			
+			long timestamp = value.getLong(":timestamp");
+			String sender = value.getString(":sender");
+			String contents = value.getString(":contents");
 			Message chatMessage = new Message(timestamp, sender, contents);
 			
 			// the callback will be dispatched in a thread pool thread
@@ -194,9 +197,9 @@ public class PublicChatActivity extends Activity {
 			return;
 		
 		TextView widget = (TextView)findViewById(R.id.editText);
-		String text = widget.getText().toString();
+		String message = widget.getText().toString();
 		try {
-			cloud.pub(chatUri(), messageBundleFor(text));
+			cloud.pub(chatUri(), bundle(message));
 		} catch (RemoteException e) {
 			toast(e.getMessage());
 			e.printStackTrace();
@@ -205,13 +208,18 @@ public class PublicChatActivity extends Activity {
 		widget.setText("");
 	}
 
+	private Bundle bundle(String message) {
+		Bundle bundle = new Bundle();
+		bundle.putBundle(":value", messageBundleFor(message));
+		return bundle;
+	}
+
 	private Bundle messageBundleFor(String text) {
 		Bundle bundle = new Bundle();
-		// TODO: bundle.putParcelable("type", Keyword.for("msg"));
-		bundle.putString("type", ":msg");
-		bundle.putString("sender", myNick);
-		bundle.putString("contents", text);
-		bundle.putLong("timestamp", System.currentTimeMillis());
+		bundle.putString(":type", ":msg");
+		bundle.putString(":sender", myNick);
+		bundle.putString(":contents", text);
+		bundle.putLong(":timestamp", System.currentTimeMillis());
 		return bundle;
 	}
 	
@@ -226,5 +234,4 @@ public class PublicChatActivity extends Activity {
 	Uri chatUri() {
 		return Uri.parse("content://public/chat");
 	}
-
 }
