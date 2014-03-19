@@ -47,6 +47,7 @@ public class PublicChatActivity extends Activity {
 			try {
 				subscription = cloud.sub(chatUri(), subscriber);
 			} catch (RemoteException e) {
+				e.printStackTrace();
 			}
 		}
 		
