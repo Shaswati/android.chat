@@ -76,17 +76,17 @@ public class PublicChatActivity extends Activity {
 	private static final int ON_CHAT_MESSAGE = 1;
 	
 	final Handler handler = new Handler() {
-  	@Override
-  	public void handleMessage(android.os.Message m) {
-  		switch (m.what) {
-  		case ON_CHAT_MESSAGE:
-  			onMessage((Message)m.obj);
-  			break;
-  			default:
-  				super.handleMessage(m);
-  		}
-  	}		
-  };
+		@Override
+		public void handleMessage(android.os.Message m) {
+			switch (m.what) {
+			case ON_CHAT_MESSAGE:
+				onMessage((Message)m.obj);
+				break;
+			default:
+				super.handleMessage(m);
+			}
+		}
+	};
 	
 	private static List<Message> MESSAGES = initMessages();
 	
