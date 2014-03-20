@@ -11,15 +11,15 @@ import android.widget.ListView;
 
 public class ChatActivity extends Activity {
 	
-	String contactSeal;
+	String contactPublicKey;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chat);
 		
-		contactSeal = getIntent().getExtras().getString("contact_seal");
-		setTitle("Conversa com " + contactSeal);
+		contactPublicKey = getIntent().getExtras().getString("contact_public_key");
+		setTitle("Conversa com " + contactPublicKey);
 		
 		ListView listView = (ListView) findViewById(R.id.listView);
 		ChatAdapter adapter = new ChatAdapter(this, R.layout.list_item_user_message, R.layout.list_item_contact_message, messages());

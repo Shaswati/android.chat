@@ -28,14 +28,14 @@
 			android:layout_alignLeft="@+id/messageContent"
 			android:textStyle="bold"
 			android:textColor="#D34F39"
-			android:text="@string/dummyText" />
+			android:text="@string/dummy_text" />
 	
 		<TextView
 			android:id="@+id/messageContent" 
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_below="@+id/messageSender"
-			android:text="@string/dummyText" />
+			android:text="@string/dummy_text" />
 		
 		<TextView
 			android:id="@+id/messageTime"
@@ -45,7 +45,7 @@
 			android:layout_alignLeft="@+id/messageContent"
 			android:textSize="12sp"
 			android:textColor="#777"
-			android:text="@string/dummyText" />
+			android:text="@string/dummy_text" />
 	
 	</RelativeLayout>
 	 
