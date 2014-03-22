@@ -138,34 +138,21 @@ public class PublicChatActivity extends Activity {
 	}
 	
 	private void pickContact() {
-	    Intent pickContactIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-	    pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-	    startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
+		Intent intent = new Intent("sneerteam.intent.action.PICK_CONTACT");
+		startActivityForResult(intent, PICK_CONTACT_REQUEST);
 	}
 	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-	    if (requestCode == PICK_CONTACT_REQUEST) {
-	    	if (resultCode == RESULT_OK) {
-	    		Uri contactData = intent.getData();
-				Cursor contactDataCursor = managedQuery(contactData, null, null, null, null);
-				if (contactDataCursor.moveToFirst()) {
-					String id = contactDataCursor.getString(contactDataCursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
-					String hasPhone = contactDataCursor.getString(contactDataCursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
-					if (hasPhone.equals("1")) {
-						Cursor phones = getContentResolver().query( 
-								ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null, 
-								ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ id, 
-								null, null);
-						phones.moveToFirst();
-						String phone = phones.getString(phones.getColumnIndex("data1"));
-						String name = contactDataCursor.getString(contactDataCursor.getColumnIndex(StructuredPostal.DISPLAY_NAME));
-						toast(phone + "\n" + name);
-					}
-				}
-	        }
-	    }
+		if (requestCode == PICK_CONTACT_REQUEST) {
+    	if (resultCode == RESULT_OK) {
+    		Bundle extras = intent.getExtras();
+				Object publicKey = extras.get("public_key");
+				Object nickname = extras.get("nickname");
+				toast(publicKey + "\n" + nickname);
+			}
+    }
 	}
 	
 	private void connect() {
