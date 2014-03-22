@@ -286,6 +286,6 @@ public class PublicChatActivity extends Activity {
 	}
 	
 	Uri chatUri() {
-		return Uri.parse("content://public/chat");
+		return Uri.parse("/public/chat");
 	}
 }
