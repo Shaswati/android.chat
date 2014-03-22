@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,6 +27,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -77,6 +82,7 @@ public class PublicChatActivity extends Activity {
 	};
 	
 	private static final int ON_CHAT_MESSAGE = 1;
+	private static final int PICK_CONTACT_REQUEST = 100;
 	
 	final Handler handler = new Handler() {
 		@Override
@@ -113,7 +119,55 @@ public class PublicChatActivity extends Activity {
 		
 		connect();
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.chat, menu);
+		return true;
+	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.action_contacts:
+				pickContact();
+				break;
+		}
+
+		return true;
+	}
+	
+	private void pickContact() {
+	    Intent pickContactIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+	    pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+	    startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
+	    if (requestCode == PICK_CONTACT_REQUEST) {
+	    	if (resultCode == RESULT_OK) {
+	    		Uri contactData = intent.getData();
+				Cursor contactDataCursor = managedQuery(contactData, null, null, null, null);
+				if (contactDataCursor.moveToFirst()) {
+					String id = contactDataCursor.getString(contactDataCursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+					String hasPhone = contactDataCursor.getString(contactDataCursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+					if (hasPhone.equals("1")) {
+						Cursor phones = getContentResolver().query( 
+								ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null, 
+								ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ id, 
+								null, null);
+						phones.moveToFirst();
+						String phone = phones.getString(phones.getColumnIndex("data1"));
+						String name = contactDataCursor.getString(contactDataCursor.getColumnIndex(StructuredPostal.DISPLAY_NAME));
+						toast(phone + "\n" + name);
+					}
+				}
+	        }
+	    }
+	}
+	
 	private void connect() {
 		bindService(
 				bindCloudServiceIntent(),
@@ -228,7 +282,7 @@ public class PublicChatActivity extends Activity {
 	}
 	
 	void toast(String message) {
-		Toast.makeText(PublicChatActivity.this, message, Toast.LENGTH_SHORT).show();
+		Toast.makeText(PublicChatActivity.this, message, Toast.LENGTH_LONG).show();
 	}
 	
 	Uri chatUri() {
