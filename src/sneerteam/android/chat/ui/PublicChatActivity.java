@@ -19,7 +19,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,8 +26,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -146,13 +143,13 @@ public class PublicChatActivity extends Activity {
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
 		if (requestCode == PICK_CONTACT_REQUEST) {
-    	if (resultCode == RESULT_OK) {
-    		Bundle extras = intent.getExtras();
+			if (resultCode == RESULT_OK) {
+				Bundle extras = intent.getExtras();
 				Object publicKey = extras.get("public_key");
 				Object nickname = extras.get("nickname");
 				toast(publicKey + "\n" + nickname);
 			}
-    }
+		}
 	}
 	
 	private void connect() {
