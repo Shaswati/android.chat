@@ -68,8 +68,9 @@ public class ChatListActivity extends FragmentActivity implements
 				String publicKey = extras.get("public_key").toString();
 				String name = extras.get("name").toString();
 				String nickname = extras.get("nickname").toString();
-				chatListFragment.addContact(new Contact(publicKey, name, nickname));
-				toast(publicKey + "\n" + nickname);
+				Contact contact = new Contact(publicKey, name, nickname);
+				chatListFragment.addContact(contact);
+				onItemSelected(contact);
 			}
 		}
 	}
