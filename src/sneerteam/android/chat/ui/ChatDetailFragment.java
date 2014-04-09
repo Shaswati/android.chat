@@ -24,7 +24,6 @@ public class ChatDetailFragment extends Fragment {
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
 	 */
-	private static List<Message> MESSAGES = initMessages();
 	private ChatAdapter chatAdapter;
 	public static final String ARG_ITEM_PUBLIC_KEY = "public_key";
 	public static final String ARG_ITEM_NICKNAME = "nickname";
@@ -49,7 +48,7 @@ public class ChatDetailFragment extends Fragment {
 		
 		// TODO: move to activity!
 		ListView listView = (ListView) this.getActivity().findViewById(R.id.listView);
-		chatAdapter = new ChatAdapter(this.getActivity(), R.layout.list_item_user_message, R.layout.list_item_contact_message, MESSAGES);
+		chatAdapter = new ChatAdapter(this.getActivity(), R.layout.list_item_user_message, R.layout.list_item_contact_message, createInitialMessages());
 		chatAdapter.setSender(nickname);
 		listView.setAdapter(chatAdapter);
 	}
@@ -69,7 +68,7 @@ public class ChatDetailFragment extends Fragment {
 		return rootView;
 	}
 	
-	private static List<Message> initMessages() {
+	private static List<Message> createInitialMessages() {
 		List<Message> messages = new ArrayList<Message>();
 		messages.add(new Message(0, "Sneer", "Welcome to chat room. Be awesome."));
 		return messages;
