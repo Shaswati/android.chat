@@ -55,7 +55,7 @@ public class PublicChatActivity extends Activity {
 			subscription = chatPath.prepend(":me")
 			  .children()
 			  .flatMap(new Func1<PathEvent, Observable<Message>>() {@Override public Observable<Message> call(PathEvent child) {
-					return child.path().value().cast(Map.class).map(new Func1<Map, Message>() {@Override public Message call(Map value) {
+					return child.path().value().first().cast(Map.class).map(new Func1<Map, Message>() {@Override public Message call(Map value) {
 						long timestamp = (Long) value.get("timestamp");
 						String sender = (String) value.get("sender");
 						String contents = (String) value.get("contents");
