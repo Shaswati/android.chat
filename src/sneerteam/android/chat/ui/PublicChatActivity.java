@@ -52,8 +52,12 @@ public class PublicChatActivity extends Activity {
 			toast("connected");
 			cloud = new CloudConnection(binder);
 			chatPath = cloud.path("public", "chat");
-			subscription = chatPath.prepend(":me")
+			
+			subscription = cloud.path()
 			  .children()
+			  .flatMap(new Func1<PathEvent, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(PathEvent publicKey) {
+			  	return publicKey.path().append("public").append("chat").children();
+			  }})
 			  .flatMap(new Func1<PathEvent, Observable<Message>>() {@Override public Observable<Message> call(PathEvent child) {
 					return child.path().value().first().cast(Map.class).map(new Func1<Map, Message>() {@Override public Message call(Map value) {
 						long timestamp = (Long) value.get("timestamp");
