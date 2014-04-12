@@ -2,13 +2,20 @@ package sneerteam.android.chat.ui;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import rx.Observable;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
 import sneerteam.android.chat.Message;
 import sneerteam.android.chat.R;
-import sneerteam.api.ICloud;
-import sneerteam.api.ISubscriber;
-import sneerteam.api.ISubscription;
+import sneerteam.snapi.CloudConnection;
+import sneerteam.snapi.Path;
+import sneerteam.snapi.PathEvent;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -19,12 +26,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,62 +41,45 @@ import android.widget.Toast;
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class PublicChatActivity extends Activity {
 	
-	volatile ICloud cloud;
-	volatile ISubscription subscription;
+	CloudConnection cloud;
+	Path chatPath;
+	Subscription subscription;
 	
 	final ServiceConnection snapi = new ServiceConnection() {
-		
+
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder binder) {
 			toast("connected");
-			cloud = ICloud.Stub.asInterface(binder);
-			try {
-				subscription = cloud.sub(chatUri(), subscriber);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
+			cloud = new CloudConnection(binder);
+			chatPath = cloud.path("public", "chat");
+			subscription = chatPath.prepend(":me")
+			  .children()
+			  .flatMap(new Func1<PathEvent, Observable<Message>>() {@Override public Observable<Message> call(PathEvent child) {
+					return child.path().value().cast(Map.class).map(new Func1<Map, Message>() {@Override public Message call(Map value) {
+						long timestamp = (Long) value.get("timestamp");
+						String sender = (String) value.get("sender");
+						String contents = (String) value.get("contents");
+						return new Message(timestamp, sender, contents);
+					}});
+				}})
+				.onErrorResumeNext(new Func1<Throwable, Observable<Message>>() {@Override public Observable<Message> call(Throwable error) {
+					return Observable.from(new Message(System.currentTimeMillis(), "<system>", error.toString()));
+			  }})
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(new Action1<Message>() {@Override public void call(Message message) {
+					toast(message.content());
+					onMessage(message);
+				}});
 		}
 		
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
 			toast("disconnected");
-			subscription = null;
-			cloud = null;
+			reset();
 		}
 	};
 	
-	final ISubscriber subscriber = new ISubscriber.Stub() {
-		@Override
-		public void on(Uri path, Bundle bundle) throws RemoteException {
-			
-			Bundle value = bundle.getBundle(":value");
-			
-			long timestamp = value.getLong(":timestamp");
-			String sender = value.getString(":sender");
-			String contents = value.getString(":contents");
-			Message chatMessage = new Message(timestamp, sender, contents);
-			
-			// the callback will be dispatched in a thread pool thread
-			// so to update the UI we need a handler to get it there 
-			handler.sendMessage(android.os.Message.obtain(handler, ON_CHAT_MESSAGE, chatMessage));
-		}
-	};
-	
-	private static final int ON_CHAT_MESSAGE = 1;
 	private static final int PICK_CONTACT_REQUEST = 100;
-	
-	final Handler handler = new Handler() {
-		@Override
-		public void handleMessage(android.os.Message m) {
-			switch (m.what) {
-			case ON_CHAT_MESSAGE:
-				onMessage((Message)m.obj);
-				break;
-			default:
-				super.handleMessage(m);
-			}
-		}
-	};
 	
 	private static List<Message> MESSAGES = initMessages();
 	
@@ -161,7 +148,7 @@ public class PublicChatActivity extends Activity {
 
 	private Intent bindCloudServiceIntent() {
 		Intent bindIntent = new Intent("sneerteam.intent.action.BIND_CLOUD_SERVICE");
-		bindIntent.setClassName("sneerteam.snapi", "sneerteam.snapi.CloudService");
+		bindIntent.setClassName("sneerteam.android.main", "sneerteam.android.main.CloudService");
 		return bindIntent;
 	}
 
@@ -174,18 +161,14 @@ public class PublicChatActivity extends Activity {
 
 	private void disconnect() {
 		if (cloud != null) {
-			cloud = null;
+			reset();
 			unbindService(snapi);
 		}
 	}
 
 	private void unsubscribe() {
 		if (subscription != null) {
-			try {
-				subscription.dispose();
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
+			subscription.unsubscribe();
 			subscription = null;
 		}
 	}
@@ -231,33 +214,28 @@ public class PublicChatActivity extends Activity {
 	}
 	
 	private void sendText() {
-		if (cloud == null)
+		if (chatPath == null)
 			return;
 		
 		TextView widget = (TextView)findViewById(R.id.editText);
 		String message = widget.getText().toString();
 		try {
-			cloud.pub(chatUri(), bundle(message));
-		} catch (RemoteException e) {
+			long timestamp = System.currentTimeMillis();
+			chatPath.append(timestamp).pub(messageBundleFor(message, timestamp));
+		} catch (Exception e) {
 			toast(e.getMessage());
 			e.printStackTrace();
 			return;
 		}
 		widget.setText("");
 	}
-
-	private Bundle bundle(String message) {
-		Bundle bundle = new Bundle();
-		bundle.putBundle(":value", messageBundleFor(message));
-		return bundle;
-	}
-
-	private Bundle messageBundleFor(String text) {
-		Bundle bundle = new Bundle();
-		bundle.putString(":type", ":msg");
-		bundle.putString(":sender", myNick);
-		bundle.putString(":contents", text);
-		bundle.putLong(":timestamp", System.currentTimeMillis());
+	
+	Map<String, Object> messageBundleFor(String text, long timestamp) {
+		Map<String, Object> bundle = new HashMap<String, Object>();
+		bundle.put("intent", "message");
+		bundle.put("sender", myNick);
+		bundle.put("contents", text);
+		bundle.put("timestamp", timestamp);
 		return bundle;
 	}
 	
@@ -268,8 +246,10 @@ public class PublicChatActivity extends Activity {
 	void toast(String message) {
 		Toast.makeText(PublicChatActivity.this, message, Toast.LENGTH_LONG).show();
 	}
-	
-	Uri chatUri() {
-		return Uri.parse("/public/chat");
+
+	private void reset() {
+		chatPath = null;
+		subscription = null;
+		cloud = null;
 	}
 }
