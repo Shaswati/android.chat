@@ -29,16 +29,17 @@
         <activity
             android:name="sneerteam.android.chat.ui.PublicChatActivity"
             android:label="@string/title_activity_chat" >
-        </activity>
-        <activity
-            android:name="sneerteam.android.chat.ui.ChatListActivity"
-            android:label="@string/title_chat_list" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
         </activity>
+        <activity
+            android:name="sneerteam.android.chat.ui.ChatListActivity"
+            android:label="@string/title_chat_list" >
+                    </activity>
         <activity
             android:name="sneerteam.android.chat.ui.ChatDetailActivity"
             android:label="@string/title_chat_detail"
