@@ -14,21 +14,18 @@ import rx.functions.Func1;
 import sneerteam.android.chat.Message;
 import sneerteam.android.chat.R;
 import sneerteam.snapi.CloudConnection;
+import sneerteam.snapi.CloudServiceConnection;
 import sneerteam.snapi.Path;
 import sneerteam.snapi.PathEvent;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,47 +38,34 @@ import android.widget.Toast;
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class PublicChatActivity extends Activity {
 	
-	CloudConnection cloud;
-	Path chatPath;
-	Subscription subscription;
+	CloudServiceConnection connection = CloudServiceConnection.prepare();
 	
-	final ServiceConnection snapi = new ServiceConnection() {
-
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder binder) {
-			toast("connected");
-			cloud = new CloudConnection(binder);
-			chatPath = cloud.path("public", "chat");
-			
-			subscription = cloud.path()
-			  .children()
-			  .flatMap(new Func1<PathEvent, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(PathEvent publicKey) {
-			  	return publicKey.path().append("public").append("chat").children();
-			  }})
-			  .flatMap(new Func1<PathEvent, Observable<Message>>() {@Override public Observable<Message> call(PathEvent child) {
-					return child.path().value().first().cast(Map.class).map(new Func1<Map, Message>() {@Override public Message call(Map value) {
-						long timestamp = (Long) value.get("timestamp");
-						String sender = (String) value.get("sender");
-						String contents = (String) value.get("contents");
-						return new Message(timestamp, sender, contents);
-					}});
-				}})
-				.onErrorResumeNext(new Func1<Throwable, Observable<Message>>() {@Override public Observable<Message> call(Throwable error) {
-					return Observable.from(new Message(System.currentTimeMillis(), "<system>", error.toString()));
-			  }})
-				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Action1<Message>() {@Override public void call(Message message) {
-					toast(message.content());
-					onMessage(message);
+	Path chatPath;
+	Subscription subscription = connection
+			.cloud()
+			.flatMap(new Func1<CloudConnection, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(CloudConnection cloud) {
+				chatPath = cloud.path("public", "chat");
+				return cloud.path().children();
+			}})
+		  .flatMap(new Func1<PathEvent, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(PathEvent publicKey) {
+		  	return publicKey.path().append("public").append("chat").children();
+		  }})
+		  .flatMap(new Func1<PathEvent, Observable<Message>>() {@Override public Observable<Message> call(PathEvent child) {
+				return child.path().value().first().cast(Map.class).map(new Func1<Map, Message>() {@Override public Message call(Map value) {
+					long timestamp = (Long) value.get("timestamp");
+					String sender = (String) value.get("sender");
+					String contents = (String) value.get("contents");
+					return new Message(timestamp, sender, contents);
 				}});
-		}
-		
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-			toast("disconnected");
-			reset();
-		}
-	};
+			}})
+			.onErrorResumeNext(new Func1<Throwable, Observable<Message>>() {@Override public Observable<Message> call(Throwable error) {
+				return Observable.from(new Message(System.currentTimeMillis(), "<system>", error.toString()));
+		  }})
+			.observeOn(AndroidSchedulers.mainThread())
+			.subscribe(new Action1<Message>() {@Override public void call(Message message) {
+				toast(message.content());
+				onMessage(message);
+			}});
 	
 	private static final int PICK_CONTACT_REQUEST = 100;
 	
@@ -95,6 +79,8 @@ public class PublicChatActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		toast("onCreate: " + System.identityHashCode(this));
+		
 		myNick = preferences().getString("myNick", null);
 		
 		setContentView(R.layout.activity_chat);
@@ -105,7 +91,7 @@ public class PublicChatActivity extends Activity {
 		chatAdapter.setSender(myNick);
 		listView.setAdapter(chatAdapter);
 		
-		connect();
+		connection.bind(this);
 	}
 	
 	@Override
@@ -142,34 +128,14 @@ public class PublicChatActivity extends Activity {
 			}
 		}
 	}
-	
-	private void connect() {
-		bindService(
-				bindCloudServiceIntent(),
-				snapi,
-				Context.BIND_AUTO_CREATE + Context.BIND_ADJUST_WITH_ACTIVITY);
-	}
-
-	private Intent bindCloudServiceIntent() {
-		Intent bindIntent = new Intent("sneerteam.intent.action.BIND_CLOUD_SERVICE");
-		bindIntent.setClassName("sneerteam.android.main", "sneerteam.android.main.CloudService");
-		return bindIntent;
-	}
 
 	@Override
 	protected void onDestroy() {
+		toast("onDestroy: " + System.identityHashCode(this));
 		unsubscribe();
-		disconnect();
 		super.onDestroy();
 	}
-
-	private void disconnect() {
-		if (cloud != null) {
-			reset();
-			unbindService(snapi);
-		}
-	}
-
+	
 	private void unsubscribe() {
 		if (subscription != null) {
 			subscription.unsubscribe();
@@ -249,11 +215,5 @@ public class PublicChatActivity extends Activity {
 	
 	void toast(String message) {
 		Toast.makeText(PublicChatActivity.this, message, Toast.LENGTH_LONG).show();
-	}
-
-	private void reset() {
-		chatPath = null;
-		subscription = null;
-		cloud = null;
 	}
 }
