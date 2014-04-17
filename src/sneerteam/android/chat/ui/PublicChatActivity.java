@@ -1,71 +1,29 @@
 package sneerteam.android.chat.ui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import rx.*;
 import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
+import rx.android.schedulers.*;
+import rx.functions.*;
+import rx.observables.*;
+import rx.subjects.*;
+import rx.subscriptions.*;
 import sneerteam.android.chat.Message;
 import sneerteam.android.chat.R;
-import sneerteam.snapi.CloudConnection;
-import sneerteam.snapi.CloudServiceConnection;
-import sneerteam.snapi.Path;
-import sneerteam.snapi.PathEvent;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import sneerteam.snapi.*;
+import android.annotation.*;
+import android.app.*;
+import android.content.*;
 import android.content.SharedPreferences.Editor;
-import android.os.Build;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.os.*;
+import android.preference.*;
+import android.util.*;
+import android.view.*;
+import android.widget.*;
 
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class PublicChatActivity extends Activity {
-	
-	CloudServiceConnection connection = CloudServiceConnection.prepare();
-	
-	Path chatPath;
-	Subscription subscription = connection
-			.cloud()
-			.flatMap(new Func1<CloudConnection, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(CloudConnection cloud) {
-				chatPath = cloud.path("public", "chat");
-				return cloud.path().children();
-			}})
-		  .flatMap(new Func1<PathEvent, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(PathEvent publicKey) {
-		  	return publicKey.path().append("public").append("chat").children();
-		  }})
-		  .flatMap(new Func1<PathEvent, Observable<Message>>() {@Override public Observable<Message> call(PathEvent child) {
-				return child.path().value().first().cast(Map.class).map(new Func1<Map, Message>() {@Override public Message call(Map value) {
-					long timestamp = (Long) value.get("timestamp");
-					String sender = (String) value.get("sender");
-					String contents = (String) value.get("contents");
-					return new Message(timestamp, sender, contents);
-				}});
-			}})
-			.onErrorResumeNext(new Func1<Throwable, Observable<Message>>() {@Override public Observable<Message> call(Throwable error) {
-				return Observable.from(new Message(System.currentTimeMillis(), "<system>", error.toString()));
-		  }})
-			.observeOn(AndroidSchedulers.mainThread())
-			.subscribe(new Action1<Message>() {@Override public void call(Message message) {
-				toast(message.content());
-				onMessage(message);
-			}});
 	
 	private static final int PICK_CONTACT_REQUEST = 100;
 	
@@ -74,6 +32,10 @@ public class PublicChatActivity extends Activity {
 	private String myNick = null;
 	
 	private ChatAdapter chatAdapter;
+	
+	private ReplaySubject<Map<String, Object>> sender = ReplaySubject.create();
+
+	private CompositeSubscription allSubscriptions;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +53,52 @@ public class PublicChatActivity extends Activity {
 		chatAdapter.setSender(myNick);
 		listView.setAdapter(chatAdapter);
 		
-		connection.bind(this);
+		ConnectableObservable<CloudConnection> cloud = CloudServiceConnection.cloudFor(this).publish();
+		
+		Subscription s1 = cloud
+			.flatMap(new Func1<CloudConnection, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(CloudConnection cloud) {
+				toast("Connected");
+				return cloud.path().children();
+			}})
+			  .flatMap(new Func1<PathEvent, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(PathEvent publicKey) {
+			  	return publicKey.path().append("public").append("chat").children();
+			  }})
+			  .flatMap(new Func1<PathEvent, Observable<Message>>() {@Override public Observable<Message> call(PathEvent child) {
+					return child.path().value().first().cast(Map.class).map(new Func1<Map, Message>() {@Override public Message call(Map value) {
+						long timestamp = (Long) value.get("timestamp");
+						String sender = (String) value.get("sender");
+						String contents = (String) value.get("contents");
+						return new Message(timestamp, sender, contents);
+					}});
+				}})
+				.onErrorResumeNext(new Func1<Throwable, Observable<Message>>() {@Override public Observable<Message> call(Throwable error) {
+					return Observable.from(new Message(System.currentTimeMillis(), "<system>", error.toString()));
+			  }})
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(new Action1<Message>() {@Override public void call(Message message) {
+					onMessage(message);
+				}});
+
+		
+		Subscription s2 = Observable.combineLatest(sender, cloud.map(new Func1<CloudConnection, Path>() {
+			@Override
+			public Path call(CloudConnection cloud) {
+				return cloud.path("public", "chat");
+			}
+		}), new Func2<Map<String, Object>, Path, Pair<Map<String, Object>, Path>>() {
+			@Override
+			public Pair<Map<String, Object>, Path> call(Map<String, Object> msg, Path path) {
+				return Pair.create(msg, path.append(msg.get("timestamp")));
+			}
+		}).subscribe(new Action1<Pair<Map<String, Object>, Path>>() {
+			@Override
+			public void call(Pair<Map<String, Object>, Path> pair) {
+				pair.second.pub(pair.first);
+			}
+		});
+
+		allSubscriptions = Subscriptions.from(cloud.connect(), s1, s2);
+
 	}
 	
 	@Override
@@ -132,15 +139,8 @@ public class PublicChatActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		toast("onDestroy: " + System.identityHashCode(this));
-		unsubscribe();
+		allSubscriptions.unsubscribe();
 		super.onDestroy();
-	}
-	
-	private void unsubscribe() {
-		if (subscription != null) {
-			subscription.unsubscribe();
-			subscription = null;
-		}
 	}
 	
 	private static List<Message> initMessages() {
@@ -184,14 +184,11 @@ public class PublicChatActivity extends Activity {
 	}
 	
 	private void sendText() {
-		if (chatPath == null)
-			return;
-		
 		TextView widget = (TextView)findViewById(R.id.editText);
 		String message = widget.getText().toString();
 		try {
 			long timestamp = System.currentTimeMillis();
-			chatPath.append(timestamp).pub(messageBundleFor(message, timestamp));
+			sender.onNext(messageBundleFor(message, timestamp));
 		} catch (Exception e) {
 			toast(e.getMessage());
 			e.printStackTrace();
