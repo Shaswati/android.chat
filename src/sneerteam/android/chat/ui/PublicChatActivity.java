@@ -53,7 +53,7 @@ public class PublicChatActivity extends Activity {
 		chatAdapter.setSender(myNick);
 		listView.setAdapter(chatAdapter);
 		
-		ConnectableObservable<CloudConnection> cloud = CloudServiceConnection.cloudFor(this).publish();
+		Observable<CloudConnection> cloud = CloudServiceConnection.cloudFor(this).publish().refCount();
 		
 		Subscription s1 = cloud
 			.flatMap(new Func1<CloudConnection, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(CloudConnection cloud) {
@@ -97,7 +97,7 @@ public class PublicChatActivity extends Activity {
 			}
 		});
 
-		allSubscriptions = Subscriptions.from(cloud.connect(), s1, s2);
+		allSubscriptions = Subscriptions.from(s1, s2);
 
 	}
 	
