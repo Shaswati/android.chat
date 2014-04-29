@@ -1,60 +1,65 @@
 package sneerteam.android.chat.ui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import rx.*;
 import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
+import rx.android.schedulers.*;
+import rx.functions.*;
+import rx.observables.*;
+import rx.subjects.*;
+import rx.subscriptions.*;
 import sneerteam.android.chat.Message;
 import sneerteam.android.chat.R;
-import sneerteam.snapi.CloudConnection;
-import sneerteam.snapi.Path;
-import sneerteam.snapi.PathEvent;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
+import sneerteam.snapi.*;
+import android.annotation.*;
+import android.app.*;
+import android.content.*;
 import android.content.SharedPreferences.Editor;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.preference.PreferenceManager;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.os.*;
+import android.preference.*;
+import android.util.*;
+import android.view.*;
+import android.widget.*;
 
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class PublicChatActivity extends Activity {
 	
-	CloudConnection cloud;
-	Path chatPath;
-	Subscription subscription;
+	private static final int PICK_CONTACT_REQUEST = 100;
 	
-	final ServiceConnection snapi = new ServiceConnection() {
+	private static List<Message> MESSAGES = initMessages();
+	
+	private String myNick = null;
+	
+	private ChatAdapter chatAdapter;
+	
+	private ReplaySubject<Map<String, Object>> sender = ReplaySubject.create();
 
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder binder) {
-			toast("connected");
-			cloud = new CloudConnection(binder);
-			chatPath = cloud.path("public", "chat");
-			
-			subscription = cloud.path()
-			  .children()
+	private CompositeSubscription allSubscriptions;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		toast("onCreate: " + System.identityHashCode(this));
+		
+		myNick = preferences().getString("myNick", null);
+		
+		setContentView(R.layout.activity_chat);
+		setTitle("Public Chat");
+		
+		ListView listView = (ListView) findViewById(R.id.listView);
+		chatAdapter = new ChatAdapter(this, R.layout.list_item_user_message, R.layout.list_item_contact_message, MESSAGES);
+		chatAdapter.setSender(myNick);
+		listView.setAdapter(chatAdapter);
+		
+		Observable<CloudConnection> cloud = CloudServiceConnection.cloudFor(this).publish().refCount();
+		
+		Subscription s1 = cloud
+			.flatMap(new Func1<CloudConnection, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(CloudConnection cloud) {
+				toast("Connected");
+				return cloud.path().children();
+			}})
 			  .flatMap(new Func1<PathEvent, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(PathEvent publicKey) {
 			  	return publicKey.path().append("public").append("chat").children();
 			  }})
@@ -71,41 +76,29 @@ public class PublicChatActivity extends Activity {
 			  }})
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(new Action1<Message>() {@Override public void call(Message message) {
-					toast(message.content());
 					onMessage(message);
 				}});
-		}
-		
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-			toast("disconnected");
-			reset();
-		}
-	};
-	
-	private static final int PICK_CONTACT_REQUEST = 100;
-	
-	private static List<Message> MESSAGES = initMessages();
-	
-	private String myNick = null;
-	
-	private ChatAdapter chatAdapter;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 		
-		myNick = preferences().getString("myNick", null);
-		
-		setContentView(R.layout.activity_chat);
-		setTitle("Public Chat");
-		
-		ListView listView = (ListView) findViewById(R.id.listView);
-		chatAdapter = new ChatAdapter(this, R.layout.list_item_user_message, R.layout.list_item_contact_message, MESSAGES);
-		chatAdapter.setSender(myNick);
-		listView.setAdapter(chatAdapter);
-		
-		connect();
+		Subscription s2 = Observable.combineLatest(sender, cloud.map(new Func1<CloudConnection, Path>() {
+			@Override
+			public Path call(CloudConnection cloud) {
+				return cloud.path("public", "chat");
+			}
+		}), new Func2<Map<String, Object>, Path, Pair<Map<String, Object>, Path>>() {
+			@Override
+			public Pair<Map<String, Object>, Path> call(Map<String, Object> msg, Path path) {
+				return Pair.create(msg, path.append(msg.get("timestamp")));
+			}
+		}).subscribe(new Action1<Pair<Map<String, Object>, Path>>() {
+			@Override
+			public void call(Pair<Map<String, Object>, Path> pair) {
+				pair.second.pub(pair.first);
+			}
+		});
+
+		allSubscriptions = Subscriptions.from(s1, s2);
+
 	}
 	
 	@Override
@@ -142,39 +135,12 @@ public class PublicChatActivity extends Activity {
 			}
 		}
 	}
-	
-	private void connect() {
-		bindService(
-				bindCloudServiceIntent(),
-				snapi,
-				Context.BIND_AUTO_CREATE + Context.BIND_ADJUST_WITH_ACTIVITY);
-	}
-
-	private Intent bindCloudServiceIntent() {
-		Intent bindIntent = new Intent("sneerteam.intent.action.BIND_CLOUD_SERVICE");
-		bindIntent.setClassName("sneerteam.android.main", "sneerteam.android.main.CloudService");
-		return bindIntent;
-	}
 
 	@Override
 	protected void onDestroy() {
-		unsubscribe();
-		disconnect();
+		toast("onDestroy: " + System.identityHashCode(this));
+		allSubscriptions.unsubscribe();
 		super.onDestroy();
-	}
-
-	private void disconnect() {
-		if (cloud != null) {
-			reset();
-			unbindService(snapi);
-		}
-	}
-
-	private void unsubscribe() {
-		if (subscription != null) {
-			subscription.unsubscribe();
-			subscription = null;
-		}
 	}
 	
 	private static List<Message> initMessages() {
@@ -218,14 +184,11 @@ public class PublicChatActivity extends Activity {
 	}
 	
 	private void sendText() {
-		if (chatPath == null)
-			return;
-		
 		TextView widget = (TextView)findViewById(R.id.editText);
 		String message = widget.getText().toString();
 		try {
 			long timestamp = System.currentTimeMillis();
-			chatPath.append(timestamp).pub(messageBundleFor(message, timestamp));
+			sender.onNext(messageBundleFor(message, timestamp));
 		} catch (Exception e) {
 			toast(e.getMessage());
 			e.printStackTrace();
@@ -249,11 +212,5 @@ public class PublicChatActivity extends Activity {
 	
 	void toast(String message) {
 		Toast.makeText(PublicChatActivity.this, message, Toast.LENGTH_LONG).show();
-	}
-
-	private void reset() {
-		chatPath = null;
-		subscription = null;
-		cloud = null;
 	}
 }
