@@ -54,17 +54,67 @@ public class PublicChatActivity extends Activity {
 		listView.setAdapter(chatAdapter);
 		
 		Observable<CloudConnection> cloud = CloudServiceConnection.cloudFor(this).publish().refCount();
+		//Cloud cloud = Cloud.cloudFor(this);
 		
 		Subscription s1 = cloud
 			.flatMap(new Func1<CloudConnection, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(CloudConnection cloud) {
 				toast("Connected");
 				return cloud.path().children();
 			}})
+		//cloud.path().children()
+
+			
+		//Hello newcomers, this is how you publish something in the cloud:	
+
+		//Cloud cloud = Cloud.cloudFor(this);
+		//cloud.path("a", "b").pub("World");
+		//cloud.path("a", "b").children();
+		//cloud.path("a", "b").lastChildren();
+		//cloud.path("a", "b").value();		//Sub
+		//cloud.path("a", "b").lastValue(); //Get?
+		//cloud.dispose(); ?
+
+		//Subscription s = CloudConnection.cloudFor(this).repeat().subscribe(
+		//	new Action1<CloudConnetion>() {
+		//		void call(CloudConnection cloud) {
+		//			cloud.path("a", "b").pub("World");
+		//		}
+		//	}
+		//);
+		//s.unsubscribe; ?
+			
+			
+			
+			
+			
+		//...
+		//cloud.path("a", "b").value().subscribe(new Action<String>(){void call(String value){
+		//	System.out.println("Hello " + value);
+		//}});
+		//
+		//onDestroy:
+		//cloud.dispose();
+
+			
+		//Hello newcomers, this is how you publish something in the cloud:	
+		//Subscription s = Cloud.cloudFor(this).subscribe(new Action<Cloud>(){void call(Cloud cloud){
+		//	cloud.path("a", "b").pub("World");
+		//	...
+		//	cloud.path("a", "b").value().subscribe(new Action<String>(){void call(String value){
+		//		System.out.println("Hello " + value);
+		//	}});
+		//}});
+		//
+		//onDestroy:
+		//s.unsubscribe();
+	
+			
+			
 			  .flatMap(new Func1<PathEvent, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(PathEvent publicKey) {
 			  	return publicKey.path().append("public").append("chat").children();
 			  }})
-			  .flatMap(new Func1<PathEvent, Observable<Message>>() {@Override public Observable<Message> call(PathEvent child) {
-					return child.path().value().first().cast(Map.class).map(new Func1<Map, Message>() {@Override public Message call(Map value) {
+			  .flatMap(new Func1<PathEvent, Observable<Message>>() {@Override public Observable<Message> call(PathEvent message) {
+					return message.path().value().first().cast(Map.class).map(new Func1<Map, Message>() {@Override public Message call(Map value) {
 						long timestamp = (Long) value.get("timestamp");
 						String sender = (String) value.get("sender");
 						String contents = (String) value.get("contents");
@@ -98,6 +148,9 @@ public class PublicChatActivity extends Activity {
 		});
 
 		allSubscriptions = Subscriptions.from(s1, s2);
+		// <Nothing>
+		
+		//onDestroy: cloud.dispose();
 
 	}
 	
@@ -189,6 +242,7 @@ public class PublicChatActivity extends Activity {
 		try {
 			long timestamp = System.currentTimeMillis();
 			sender.onNext(messageBundleFor(message, timestamp));
+			//cloud.path("public", "chat", timestamp).pub(message);
 		} catch (Exception e) {
 			toast(e.getMessage());
 			e.printStackTrace();
