@@ -2,13 +2,10 @@ package sneerteam.android.chat.ui;
 
 import java.util.*;
 
-import rx.*;
 import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
-import rx.observables.*;
 import rx.subjects.*;
-import rx.subscriptions.*;
 import sneerteam.android.chat.Message;
 import sneerteam.android.chat.R;
 import sneerteam.snapi.*;
@@ -35,7 +32,7 @@ public class PublicChatActivity extends Activity {
 	
 	private ReplaySubject<Map<String, Object>> sender = ReplaySubject.create();
 
-	private CompositeSubscription allSubscriptions;
+	private Cloud cloud;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,63 +50,15 @@ public class PublicChatActivity extends Activity {
 		chatAdapter.setSender(myNick);
 		listView.setAdapter(chatAdapter);
 		
-		Observable<CloudConnection> cloud = CloudServiceConnection.cloudFor(this).publish().refCount();
-		//Cloud cloud = Cloud.cloudFor(this);
-		
-		Subscription s1 = cloud
-			.flatMap(new Func1<CloudConnection, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(CloudConnection cloud) {
-				toast("Connected");
-				return cloud.path().children();
-			}})
-		//cloud.path().children()
-
+		cloud = Cloud.cloudFor(this);
 			
-		//Hello newcomers, this is how you publish something in the cloud:	
-
-		//Cloud cloud = Cloud.cloudFor(this);
-		//cloud.path("a", "b").pub("World");
-		//cloud.path("a", "b").children();
+		//cloud.path("a", "b").pub("Hello!");
 		//cloud.path("a", "b").lastChildren();
 		//cloud.path("a", "b").value();		//Sub
 		//cloud.path("a", "b").lastValue(); //Get?
 		//cloud.dispose(); ?
 
-		//Subscription s = CloudConnection.cloudFor(this).repeat().subscribe(
-		//	new Action1<CloudConnetion>() {
-		//		void call(CloudConnection cloud) {
-		//			cloud.path("a", "b").pub("World");
-		//		}
-		//	}
-		//);
-		//s.unsubscribe; ?
-			
-			
-			
-			
-			
-		//...
-		//cloud.path("a", "b").value().subscribe(new Action<String>(){void call(String value){
-		//	System.out.println("Hello " + value);
-		//}});
-		//
-		//onDestroy:
-		//cloud.dispose();
-
-			
-		//Hello newcomers, this is how you publish something in the cloud:	
-		//Subscription s = Cloud.cloudFor(this).subscribe(new Action<Cloud>(){void call(Cloud cloud){
-		//	cloud.path("a", "b").pub("World");
-		//	...
-		//	cloud.path("a", "b").value().subscribe(new Action<String>(){void call(String value){
-		//		System.out.println("Hello " + value);
-		//	}});
-		//}});
-		//
-		//onDestroy:
-		//s.unsubscribe();
-	
-			
-			
+		cloud.path().children()
 			  .flatMap(new Func1<PathEvent, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(PathEvent publicKey) {
 			  	return publicKey.path().append("public").append("chat").children();
 			  }})
@@ -125,27 +74,15 @@ public class PublicChatActivity extends Activity {
 				}});
 
 		
-		Subscription s2 = Observable.combineLatest(sender, cloud.map(new Func1<CloudConnection, Path>() {
-			@Override
-			public Path call(CloudConnection cloud) {
-				return cloud.path("public", "chat");
-			}
-		}), new Func2<Map<String, Object>, Path, Pair<Map<String, Object>, Path>>() {
-			@Override
-			public Pair<Map<String, Object>, Path> call(Map<String, Object> msg, Path path) {
-				return Pair.create(msg, path.append(msg.get("timestamp")));
-			}
-		}).subscribe(new Action1<Pair<Map<String, Object>, Path>>() {
-			@Override
-			public void call(Pair<Map<String, Object>, Path> pair) {
-				pair.second.pub(pair.first);
-			}
-		});
-
-		allSubscriptions = Subscriptions.from(s1, s2);
-		// <Nothing>
-		
-		//onDestroy: cloud.dispose();
+		Observable.combineLatest(
+				sender, 
+				cloud.path("public", "chat").children(), 
+				new Func2<Map<String, Object>, PathEvent, Pair<Map<String, Object>, Path>>() {@Override public Pair<Map<String, Object>, Path> call(Map<String, Object> msg, PathEvent path) {
+					return Pair.create(msg, path.path().append(msg.get("timestamp")));
+				}
+		}).subscribe(new Action1<Pair<Map<String, Object>, Path>>() {@Override public void call(Pair<Map<String, Object>, Path> pair) {
+			pair.second.pub(pair.first);
+		}});
 
 	}
 	
@@ -187,7 +124,7 @@ public class PublicChatActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		toast("onDestroy: " + System.identityHashCode(this));
-		allSubscriptions.unsubscribe();
+		cloud.dispose();
 		super.onDestroy();
 	}
 	
