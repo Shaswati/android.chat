@@ -19,31 +19,21 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="sneerteam.android.chat.ui.MainActivity"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
-            android:name="sneerteam.android.chat.ui.ChatActivity"
+            android:name=".ui.PublicChatActivity"
             android:label="@string/title_activity_chat" >
         </activity>
         <activity
-            android:name="sneerteam.android.chat.ui.PublicChatActivity"
-            android:label="@string/title_activity_chat" >
+            android:name=".ui.ChatListActivity"
+            android:label="@string/title_chat_list" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            
         </activity>
         <activity
-            android:name="sneerteam.android.chat.ui.ChatListActivity"
-            android:label="@string/title_chat_list" >
-                    </activity>
-        <activity
-            android:name="sneerteam.android.chat.ui.ChatDetailActivity"
+            android:name=".ui.ChatDetailActivity"
             android:label="@string/title_chat_detail"
-            android:parentActivityName="sneerteam.android.chat.ui.ChatListActivity" >
+            android:parentActivityName=".ui.ChatListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ChatListActivity" />
