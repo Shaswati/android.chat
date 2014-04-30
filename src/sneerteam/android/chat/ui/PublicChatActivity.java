@@ -114,12 +114,7 @@ public class PublicChatActivity extends Activity {
 			  	return publicKey.path().append("public").append("chat").children();
 			  }})
 			  .flatMap(new Func1<PathEvent, Observable<Message>>() {@Override public Observable<Message> call(PathEvent message) {
-					return message.path().value().first().cast(Map.class).map(new Func1<Map, Message>() {@Override public Message call(Map value) {
-						long timestamp = (Long) value.get("timestamp");
-						String sender = (String) value.get("sender");
-						String contents = (String) value.get("contents");
-						return new Message(timestamp, sender, contents);
-					}});
+					return message.path().value().first().cast(Map.class).map(Message.mapToMessage());
 				}})
 				.onErrorResumeNext(new Func1<Throwable, Observable<Message>>() {@Override public Observable<Message> call(Throwable error) {
 					return Observable.from(new Message(System.currentTimeMillis(), "<system>", error.toString()));

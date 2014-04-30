@@ -1,8 +1,11 @@
 package sneerteam.android.chat;
 
 import android.annotation.SuppressLint;
+
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
+
+import rx.functions.*;
 
 public class Message implements Comparable<Message> {
 	
@@ -76,6 +79,18 @@ public class Message implements Comparable<Message> {
 			return false;
 		return true;
 	}
-	
+
+	@SuppressWarnings("rawtypes")
+	public static Func1<? super Map, ? extends Message> mapToMessage() {
+		return new Func1<Map, Message>() {
+			@Override
+			public Message call(Map value) {
+				long timestamp = (Long) value.get("timestamp");
+				String sender = (String) value.get("sender");
+				String contents = (String) value.get("contents");
+				return new Message(timestamp, sender, contents);
+			}
+		};
+	}	
 	
 }
