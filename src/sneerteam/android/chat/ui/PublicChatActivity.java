@@ -5,7 +5,6 @@ import java.util.*;
 import rx.Observable;
 import rx.android.schedulers.*;
 import rx.functions.*;
-import rx.subjects.*;
 import sneerteam.android.chat.Message;
 import sneerteam.android.chat.R;
 import sneerteam.snapi.*;
@@ -30,8 +29,6 @@ public class PublicChatActivity extends Activity {
 	
 	private ChatAdapter chatAdapter;
 	
-	private ReplaySubject<Map<String, Object>> sender = ReplaySubject.create();
-
 	private Cloud cloud;
 
 	@Override
@@ -62,8 +59,25 @@ public class PublicChatActivity extends Activity {
 			  .flatMap(new Func1<PathEvent, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(PathEvent publicKey) {
 			  	return publicKey.path().append("public").append("chat").children();
 			  }})
-			  .flatMap(new Func1<PathEvent, Observable<Message>>() {@Override public Observable<Message> call(PathEvent message) {
-					return message.path().value().first().cast(Map.class).map(Message.mapToMessage());
+			  .flatMap(new Func1<PathEvent, Observable<Pair<Object, Object>>>() {@Override public Observable<Pair<Object, Object>> call(PathEvent message) {
+					final Path path = message.path();
+					return path.value().first().map(new Func1<Object, Pair<Object, Object>>() {@Override public Pair<Object, Object> call(Object value) {
+						return Pair.create(path.lastSegment(), value);
+					}});
+				}})
+			  .map(new Func1<Pair<Object, Object>, Message>() {@Override public Message call(Pair<Object, Object> timestampAndMessage) {
+				  if (timestampAndMessage.second instanceof Map) {
+					  return Message.mapToMessage().call((Map)timestampAndMessage.second);
+				  } else {
+					  long ts;
+					  try {
+						  ts = (Long)timestampAndMessage.first;
+					  } catch (ClassCastException e) {
+						  ts = System.currentTimeMillis();
+					  }
+					  return new Message(ts, "<system>", ""+timestampAndMessage.second);
+					  
+				  }
 				}})
 				.onErrorResumeNext(new Func1<Throwable, Observable<Message>>() {@Override public Observable<Message> call(Throwable error) {
 					return Observable.from(new Message(System.currentTimeMillis(), "<system>", error.toString()));
@@ -72,17 +86,6 @@ public class PublicChatActivity extends Activity {
 				.subscribe(new Action1<Message>() {@Override public void call(Message message) {
 					onMessage(message);
 				}});
-
-		
-		Observable.combineLatest(
-				sender, 
-				cloud.path("public", "chat").children(), 
-				new Func2<Map<String, Object>, PathEvent, Pair<Map<String, Object>, Path>>() {@Override public Pair<Map<String, Object>, Path> call(Map<String, Object> msg, PathEvent path) {
-					return Pair.create(msg, path.path().append(msg.get("timestamp")));
-				}
-		}).subscribe(new Action1<Pair<Map<String, Object>, Path>>() {@Override public void call(Pair<Map<String, Object>, Path> pair) {
-			pair.second.pub(pair.first);
-		}});
 
 	}
 	
@@ -173,8 +176,7 @@ public class PublicChatActivity extends Activity {
 		String message = widget.getText().toString();
 		try {
 			long timestamp = System.currentTimeMillis();
-			sender.onNext(messageBundleFor(message, timestamp));
-			//cloud.path("public", "chat", timestamp).pub(message);
+			cloud.path("public", "chat", timestamp).pub(messageBundleFor(message, timestamp));
 		} catch (Exception e) {
 			toast(e.getMessage());
 			e.printStackTrace();
