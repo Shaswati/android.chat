@@ -8,9 +8,8 @@ import sneerteam.snapi.Cloud;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.*;
+import android.widget.*;
 
 /**
  * An activity representing a list of Chats. This activity has different
@@ -41,6 +40,8 @@ public class ChatListActivity extends FragmentActivity implements
 	private boolean mTwoPane;
 
 	private Cloud cloud;
+
+	private Contact contact;
 	
 
 	@Override
@@ -120,6 +121,7 @@ public class ChatListActivity extends FragmentActivity implements
 	 */
 	@Override
 	public void onItemSelected(Contact contact) {
+		this.contact = contact;
 		if (mTwoPane) {
 			// In two-pane mode, show the detail view in this activity by
 			// adding or replacing the detail fragment using a
@@ -138,6 +140,13 @@ public class ChatListActivity extends FragmentActivity implements
 			detailIntent.putExtra("contact", contact);
 			startActivity(detailIntent);
 		}
+	}
+	
+	public void onSendButtonClick(View view) {
+		TextView widget = (TextView)findViewById(R.id.editText);
+		String message = widget.getText().toString();
+		cloud.path("contacts", contact.getPublicKey(), "chat", System.currentTimeMillis()).pub(message);
+		widget.setText("");
 	}
 	
 	void toast(String message) {

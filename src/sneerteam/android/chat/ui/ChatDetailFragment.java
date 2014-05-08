@@ -10,6 +10,7 @@ import sneerteam.android.chat.R;
 import sneerteam.snapi.*;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.View;
 import android.widget.ListView;
 
 /**
@@ -40,28 +41,23 @@ public class ChatDetailFragment extends Fragment {
 		contact = (Contact) getArguments().getSerializable("contact");
 		this.getActivity().setTitle(contact.getNickname());
 		
-		// TODO: move to activity!
-		ListView listView = (ListView) this.getActivity().findViewById(R.id.listView);
 		chatAdapter = new ChatAdapter(this.getActivity(), R.layout.list_item_user_message, R.layout.list_item_contact_message, messages);
 		chatAdapter.setSender("me");
+
+		ListView listView = (ListView) this.getActivity().findViewById(R.id.listView);
 		listView.setAdapter(chatAdapter);
 		
 		cloud = Cloud.cloudFor(getActivity());
 		
-		cloud.path(":me", "contacts", contact.getPublicKey(), "chat").children()
+		listenOn(cloud.path(":me", "contacts", contact.getPublicKey(), "chat"), "me");
+		listenOn(cloud.path(contact.getPublicKey(), "contacts", ":me", "chat"), contact.getNickname());
+	}
+
+	private void listenOn(CloudPath path, final String sender) {
+		path.children()
 			.flatMap(new Func1<PathEvent, Observable<? extends Message>>() {@Override public Observable<? extends Message> call(final PathEvent path) {
 				return path.path().value().map(new Func1<Object, Message>() {@Override public Message call(Object message) {
-					return new Message((Long) path.path().lastSegment(), contact.getNickname(), (String)message);
-				}});
-			}}).observeOn(AndroidSchedulers.mainThread())
-			.subscribe(new Action1<Message>() {@Override public void call(Message msg) {
-				onMessage(msg);
-			}});
-		
-		cloud.path(contact.getPublicKey(), "contacts", ":me", "chat").children()
-			.flatMap(new Func1<PathEvent, Observable<? extends Message>>() {@Override public Observable<? extends Message> call(final PathEvent path) {
-				return path.path().value().map(new Func1<Object, Message>() {@Override public Message call(Object message) {
-					return new Message((Long) path.path().lastSegment(), "me", (String)message);
+					return new Message((Long) path.path().lastSegment(), sender, (String)message);
 				}});
 			}}).observeOn(AndroidSchedulers.mainThread())
 			.subscribe(new Action1<Message>() {@Override public void call(Message msg) {
