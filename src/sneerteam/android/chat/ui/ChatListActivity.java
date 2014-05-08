@@ -1,7 +1,10 @@
 package sneerteam.android.chat.ui;
 
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import sneerteam.android.chat.Contact;
 import sneerteam.android.chat.R;
+import sneerteam.snapi.Cloud;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -36,6 +39,8 @@ public class ChatListActivity extends FragmentActivity implements
 	 * device.
 	 */
 	private boolean mTwoPane;
+
+	private Cloud cloud;
 	
 
 	@Override
@@ -66,11 +71,14 @@ public class ChatListActivity extends FragmentActivity implements
 			if (resultCode == RESULT_OK) {
 				Bundle extras = intent.getExtras();
 				String publicKey = extras.get("public_key").toString();
-				String name = extras.get("name").toString();
 				String nickname = extras.get("nickname").toString();
-				Contact contact = new Contact(publicKey, name, nickname);
+				final Contact contact = new Contact(publicKey, nickname);
 				chatListFragment.addContact(contact);
 				onItemSelected(contact);
+				cloud.path(publicKey, "info", "name").value().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Object>() {@Override public void call(Object name) {
+					contact.setName((String) name);
+					chatListFragment.contactChanged(contact);
+				}});
 			}
 		}
 	}
@@ -79,6 +87,8 @@ public class ChatListActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chat_list);
+		
+		cloud = Cloud.cloudFor(this);
 		
 		chatListFragment = (ChatListFragment) getSupportFragmentManager().findFragmentById(
 				R.id.chat_list);
@@ -96,6 +106,12 @@ public class ChatListActivity extends FragmentActivity implements
 		}
 
 		// TODO: If exposing deep links into your app, handle intents here.
+	}
+	
+	@Override
+	protected void onDestroy() {
+		cloud.dispose();
+		super.onDestroy();
 	}
 
 	/**

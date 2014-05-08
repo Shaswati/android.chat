@@ -6,9 +6,8 @@ public class Contact {
 	private String name;
 	private String nickname;
 	
-	public Contact(String public_key, String name, String nickname) {
+	public Contact(String public_key, String nickname) {
 		this.public_key = public_key;
-		this.name = name;
 		this.nickname = nickname;
 	}
 
@@ -37,7 +36,7 @@ public class Contact {
 	}
 	
 	@Override public String toString() {
-		return name;
+		return nickname;
 	}
 
 	@Override

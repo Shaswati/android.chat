@@ -167,4 +167,8 @@ public class ChatListFragment extends ListFragment {
 			contactsAdapter.notifyDataSetChanged();
 		}
 	}
+
+	public void contactChanged(Contact contact) {
+		contactsAdapter.notifyDataSetChanged();
+	}
 }
