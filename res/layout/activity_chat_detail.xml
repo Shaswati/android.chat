@@ -3,7 +3,7 @@
     android:id="@+id/chat_detail_container"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/chat_background"
+    android:background="#DDDDDD"
     tools:context=".ChatDetailActivity"
     tools:ignore="MergeRootFrame" >
 
@@ -34,7 +34,7 @@
         </EditText>
 
         <Button
-            android:id="@+id/skipButton"
+            android:id="@+id/sendButton"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"

@@ -1,11 +1,13 @@
 package sneerteam.android.chat.ui;
 
-import sneerteam.android.chat.R;
+import sneerteam.android.chat.*;
+import sneerteam.snapi.Cloud;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.NavUtils;
-import android.view.MenuItem;
+import android.support.v4.app.*;
+import android.util.Log;
+import android.view.*;
+import android.widget.TextView;
 
 /**
  * An activity representing a single Chat detail screen. This activity is only
@@ -17,6 +19,9 @@ import android.view.MenuItem;
  */
 public class ChatDetailActivity extends FragmentActivity {
 
+	private Contact contact;
+	private Cloud cloud;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -24,7 +29,9 @@ public class ChatDetailActivity extends FragmentActivity {
 
 		// Show the Up button in the action bar.
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-
+		
+		cloud = Cloud.cloudFor(this);
+		
 		// savedInstanceState is non-null when there is fragment state
 		// saved from previous configurations of this activity
 		// (e.g. when rotating the screen from portrait to landscape).
@@ -38,15 +45,32 @@ public class ChatDetailActivity extends FragmentActivity {
 			// Create the detail fragment and add it to the activity
 			// using a fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putString(ChatDetailFragment.ARG_ITEM_PUBLIC_KEY, getIntent()
-					.getStringExtra(ChatDetailFragment.ARG_ITEM_PUBLIC_KEY));
-			arguments.putString(ChatDetailFragment.ARG_ITEM_NICKNAME, getIntent()
-					.getStringExtra(ChatDetailFragment.ARG_ITEM_NICKNAME));
+			contact = (Contact) getIntent().getSerializableExtra("contact");
+			arguments.putSerializable("contact", contact);
+			
 			ChatDetailFragment fragment = new ChatDetailFragment();
 			fragment.setArguments(arguments);
+			
 			getSupportFragmentManager().beginTransaction()
 					.add(R.id.chat_detail_container, fragment).commit();
 		}
+	}
+	
+	@Override
+	protected void onDestroy() {
+		cloud.dispose();
+		super.onDestroy();
+	}
+	
+	public void onSendButtonClick(View view) {
+		TextView widget = (TextView)findViewById(R.id.editText);
+		String message = widget.getText().toString();
+		cloud.path("contacts", contact.getPublicKey(), "chat", System.currentTimeMillis()).pub(message);
+		widget.setText("");
+	}
+	
+	private void log(String string) {
+		Log.d(ChatDetailFragment.class.getSimpleName(), string);
 	}
 
 	@Override

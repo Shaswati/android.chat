@@ -1,18 +1,16 @@
 package sneerteam.android.chat.ui;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import sneerteam.android.chat.Message;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.*;
+import sneerteam.android.chat.*;
 import sneerteam.android.chat.R;
-import sneerteam.android.chat.dummy.DummyContent;
+import sneerteam.snapi.*;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 
 /**
  * A fragment representing a single Chat detail screen. This fragment is either
@@ -25,13 +23,9 @@ public class ChatDetailFragment extends Fragment {
 	 * represents.
 	 */
 	private ChatAdapter chatAdapter;
-	public static final String ARG_ITEM_PUBLIC_KEY = "public_key";
-	public static final String ARG_ITEM_NICKNAME = "nickname";
-
-	/**
-	 * The dummy content this fragment is presenting.
-	 */
-	private DummyContent.DummyItem mItem;
+	private Contact contact;
+	private List<Message> messages = createInitialMessages();
+	private Cloud cloud;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -43,29 +37,51 @@ public class ChatDetailFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		String nickname = getArguments().getString(ARG_ITEM_NICKNAME);
-		this.getActivity().setTitle(nickname);
+		contact = (Contact) getArguments().getSerializable("contact");
+		this.getActivity().setTitle(contact.getNickname());
 		
 		// TODO: move to activity!
 		ListView listView = (ListView) this.getActivity().findViewById(R.id.listView);
-		chatAdapter = new ChatAdapter(this.getActivity(), R.layout.list_item_user_message, R.layout.list_item_contact_message, createInitialMessages());
-		chatAdapter.setSender(nickname);
+		chatAdapter = new ChatAdapter(this.getActivity(), R.layout.list_item_user_message, R.layout.list_item_contact_message, messages);
+		chatAdapter.setSender("me");
 		listView.setAdapter(chatAdapter);
+		
+		cloud = Cloud.cloudFor(getActivity());
+		
+		cloud.path(":me", "contacts", contact.getPublicKey(), "chat").children()
+			.flatMap(new Func1<PathEvent, Observable<? extends Message>>() {@Override public Observable<? extends Message> call(final PathEvent path) {
+				return path.path().value().map(new Func1<Object, Message>() {@Override public Message call(Object message) {
+					return new Message((Long) path.path().lastSegment(), contact.getNickname(), (String)message);
+				}});
+			}}).observeOn(AndroidSchedulers.mainThread())
+			.subscribe(new Action1<Message>() {@Override public void call(Message msg) {
+				onMessage(msg);
+			}});
+		
+		cloud.path(contact.getPublicKey(), "contacts", ":me", "chat").children()
+			.flatMap(new Func1<PathEvent, Observable<? extends Message>>() {@Override public Observable<? extends Message> call(final PathEvent path) {
+				return path.path().value().map(new Func1<Object, Message>() {@Override public Message call(Object message) {
+					return new Message((Long) path.path().lastSegment(), "me", (String)message);
+				}});
+			}}).observeOn(AndroidSchedulers.mainThread())
+			.subscribe(new Action1<Message>() {@Override public void call(Message msg) {
+				onMessage(msg);
+			}});
+	}
+	
+	protected void onMessage(Message msg) {
+		int insertionPointHint = Collections.binarySearch(messages, msg);
+		if (insertionPointHint < 0) {
+			int insertionPoint = Math.abs(insertionPointHint) - 1;
+			messages.add(insertionPoint, msg);
+			chatAdapter.notifyDataSetChanged();
+		}
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_chat_detail,
-				container, false);
-
-		// Show the dummy content as text in a TextView.
-		if (mItem != null) {
-			((TextView) rootView.findViewById(R.id.chat_detail))
-					.setText(mItem.content);
-		}
-
-		return rootView;
+	public void onDestroy() {
+		cloud.dispose();
+		super.onDestroy();
 	}
 	
 	private static List<Message> createInitialMessages() {

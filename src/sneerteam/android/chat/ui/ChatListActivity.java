@@ -125,8 +125,7 @@ public class ChatListActivity extends FragmentActivity implements
 			// adding or replacing the detail fragment using a
 			// fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putString(ChatDetailFragment.ARG_ITEM_PUBLIC_KEY, contact.getPublicKey());
-			arguments.putString(ChatDetailFragment.ARG_ITEM_NICKNAME, contact.getNickname());
+			arguments.putSerializable("contact", contact);
 			ChatDetailFragment fragment = new ChatDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
@@ -136,8 +135,7 @@ public class ChatListActivity extends FragmentActivity implements
 			// In single-pane mode, simply start the detail activity
 			// for the selected item ID.
 			Intent detailIntent = new Intent(this, ChatDetailActivity.class);
-			detailIntent.putExtra(ChatDetailFragment.ARG_ITEM_PUBLIC_KEY, contact.getPublicKey());
-			detailIntent.putExtra(ChatDetailFragment.ARG_ITEM_NICKNAME, contact.getNickname());
+			detailIntent.putExtra("contact", contact);
 			startActivity(detailIntent);
 		}
 	}
