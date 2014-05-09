@@ -5,6 +5,7 @@ import rx.functions.Action1;
 import sneerteam.android.chat.Contact;
 import sneerteam.android.chat.R;
 import sneerteam.snapi.Cloud;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -143,9 +144,13 @@ public class ChatListActivity extends FragmentActivity implements
 	}
 	
 	public void onSendButtonClick(View view) {
-		TextView widget = (TextView)findViewById(R.id.editText);
+		sendMessage(this, cloud, contact.getPublicKey());
+	}
+
+	public static void sendMessage(Activity activity, Cloud cloud, String contact) {
+		TextView widget = (TextView)activity.findViewById(R.id.editText);
 		String message = widget.getText().toString();
-		cloud.path("contacts", contact.getPublicKey(), "chat", System.currentTimeMillis()).pub(message);
+		cloud.path("chat", "private", contact, System.currentTimeMillis()).pub(message);
 		widget.setText("");
 	}
 	

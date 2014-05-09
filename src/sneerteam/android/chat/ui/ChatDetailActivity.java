@@ -63,10 +63,7 @@ public class ChatDetailActivity extends FragmentActivity {
 	}
 	
 	public void onSendButtonClick(View view) {
-		TextView widget = (TextView)findViewById(R.id.editText);
-		String message = widget.getText().toString();
-		cloud.path("contacts", contact.getPublicKey(), "chat", System.currentTimeMillis()).pub(message);
-		widget.setText("");
+		ChatListActivity.sendMessage(this, cloud, contact.getPublicKey());
 	}
 	
 	private void log(String string) {
