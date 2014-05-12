@@ -1,15 +1,18 @@
 package sneerteam.android.chat;
 
-import java.io.Serializable;
+import android.os.*;
 
-public class Contact implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class Contact implements Parcelable {
 	
 	private String public_key;
 	private String name;
 	private String nickname;
 	
 	public Contact(String public_key, String nickname) {
+		this(public_key, null, nickname);
+	}
+
+	public Contact(String public_key, String name, String nickname) {
 		this.public_key = public_key;
 		this.nickname = nickname;
 	}
@@ -80,4 +83,27 @@ public class Contact implements Serializable {
 			return false;
 		return true;
 	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(public_key);
+		dest.writeString(name);
+		dest.writeString(nickname);
+	}
+
+	public static final Parcelable.Creator<Contact> CREATOR = new Parcelable.Creator<Contact>() {
+		public Contact createFromParcel(Parcel in) {
+			return new Contact(in.readString(), in.readString(), in.readString());
+		}
+
+		public Contact[] newArray(int size) {
+			return new Contact[size];
+		}
+	};
+
 }

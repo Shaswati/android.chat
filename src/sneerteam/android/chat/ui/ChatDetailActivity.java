@@ -45,8 +45,8 @@ public class ChatDetailActivity extends FragmentActivity {
 			// Create the detail fragment and add it to the activity
 			// using a fragment transaction.
 			Bundle arguments = new Bundle();
-			contact = (Contact) getIntent().getSerializableExtra("contact");
-			arguments.putSerializable("contact", contact);
+			contact = (Contact) getIntent().getParcelableExtra("contact");
+			arguments.putParcelable("contact", contact);
 			
 			ChatDetailFragment fragment = new ChatDetailFragment();
 			fragment.setArguments(arguments);
