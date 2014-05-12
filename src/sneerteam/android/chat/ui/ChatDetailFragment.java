@@ -1,19 +1,29 @@
 package sneerteam.android.chat.ui;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.*;
-import sneerteam.android.chat.*;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import sneerteam.android.chat.Contact;
+import sneerteam.android.chat.Message;
 import sneerteam.android.chat.R;
-import sneerteam.snapi.*;
+import sneerteam.snapi.Cloud;
+import sneerteam.snapi.CloudPath;
+import sneerteam.snapi.PathEvent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.*;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
-import android.widget.*;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 /**
@@ -62,7 +72,7 @@ public class ChatDetailFragment extends Fragment {
 	
 	private static List<Message> createInitialMessages() {
 		List<Message> messages = new ArrayList<Message>();
-		messages.add(new Message(0, "Sneer", "Welcome to chat room. Be awesome."));
+		messages.add(new Message(0, "Sneer", "Welcome to Sneer chat. Be awesome."));
 		return messages;
 	}
 	
