@@ -10,8 +10,11 @@ import sneerteam.android.chat.R;
 import sneerteam.snapi.*;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.View;
-import android.widget.ListView;
+import android.view.*;
+import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.widget.*;
+import android.widget.TextView.OnEditorActionListener;
 
 /**
  * A fragment representing a single Chat detail screen. This fragment is either
@@ -24,8 +27,8 @@ public class ChatDetailFragment extends Fragment {
 	 * represents.
 	 */
 	private ChatAdapter chatAdapter;
-	private Contact contact;
 	private List<Message> messages = createInitialMessages();
+	private Contact contact;
 	private Cloud cloud;
 
 	/**
@@ -33,24 +36,6 @@ public class ChatDetailFragment extends Fragment {
 	 * fragment (e.g. upon screen orientation changes).
 	 */
 	public ChatDetailFragment() {
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		contact = (Contact) getArguments().getSerializable("contact");
-		this.getActivity().setTitle(contact.getNickname());
-		
-		chatAdapter = new ChatAdapter(this.getActivity(), R.layout.list_item_user_message, R.layout.list_item_contact_message, messages);
-		chatAdapter.setSender("me");
-
-		ListView listView = (ListView) this.getActivity().findViewById(R.id.listView);
-		listView.setAdapter(chatAdapter);
-		
-		cloud = Cloud.cloudFor(getActivity());
-		
-		listenOn(cloud.path(":me", "contacts", contact.getPublicKey(), "chat"), "me");
-		listenOn(cloud.path(contact.getPublicKey(), "contacts", ":me", "chat"), contact.getNickname());
 	}
 
 	private void listenOn(CloudPath path, final String sender) {
@@ -74,15 +59,58 @@ public class ChatDetailFragment extends Fragment {
 		}
 	}
 
-	@Override
-	public void onDestroy() {
-		cloud.dispose();
-		super.onDestroy();
-	}
 	
 	private static List<Message> createInitialMessages() {
 		List<Message> messages = new ArrayList<Message>();
 		messages.add(new Message(0, "Sneer", "Welcome to chat room. Be awesome."));
 		return messages;
 	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View rootView = inflater.inflate(R.layout.fragment_chat_detail, container, false);
+
+		contact = (Contact) getArguments().getParcelable("contact");
+
+		this.getActivity().setTitle(contact.getNickname());
+		
+		cloud = Cloud.cloudFor(this.getActivity());
+		
+		chatAdapter = new ChatAdapter(this.getActivity(), inflater, R.layout.list_item_user_message, R.layout.list_item_contact_message, messages);
+		chatAdapter.setSender("me");
+
+		ListView listView = (ListView) rootView.findViewById(R.id.listView);
+		listView.setAdapter(chatAdapter);
+		
+		listenOn(cloud.path(":me", "chat", "private", contact.getPublicKey()), "me");
+		listenOn(cloud.path(contact.getPublicKey(), "chat", "private", ":me"), contact.getNickname());
+
+		final TextView widget = (TextView)rootView.findViewById(R.id.editText);
+		
+		widget.setOnEditorActionListener(new OnEditorActionListener() {@Override public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+			if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+				sendText(widget);
+			}
+			return false;
+		}});
+		
+		Button b =  (Button) rootView.findViewById(R.id.sendButton);
+		b.setOnClickListener(new OnClickListener() {@Override public void onClick(View v) {
+			sendText(widget);
+		}});
+
+		return rootView;
+	}
+	
+	@Override
+	public void onDestroyView() {
+		cloud.dispose();
+		super.onDestroyView();
+	}
+
+	private void sendText(final TextView widget) {
+		cloud.path("chat", "private", contact.getPublicKey(), System.currentTimeMillis()).pub(widget.getText().toString());
+		widget.setText("");
+	}
+
 }

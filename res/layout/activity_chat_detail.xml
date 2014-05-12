@@ -1,46 +1,7 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/chat_detail_container"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="#DDDDDD"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context=".ChatDetailActivity"
-    tools:ignore="MergeRootFrame" >
-
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:stackFromBottom="true"
-		android:transcriptMode="normal"
-		android:divider="@null"
-		android:padding="10dp"
-        android:layout_above="@+id/messageSender" />
-
-    <LinearLayout
-        android:id="@+id/messageSender"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="#DDDDDD"
-        android:orientation="horizontal" >
-
-        <EditText
-            android:id="@+id/editText"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:inputType="text" >
-        </EditText>
-
-        <Button
-            android:id="@+id/sendButton"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/button_send"
-            android:onClick="onSendButtonClick">
-        </Button>
-    </LinearLayout>
-
-</RelativeLayout>
+    tools:ignore="MergeRootFrame" />

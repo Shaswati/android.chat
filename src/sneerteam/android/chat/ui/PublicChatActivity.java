@@ -43,7 +43,7 @@ public class PublicChatActivity extends Activity {
 		setTitle("Public Chat");
 		
 		ListView listView = (ListView) findViewById(R.id.listView);
-		chatAdapter = new ChatAdapter(this, R.layout.list_item_user_message, R.layout.list_item_contact_message, MESSAGES);
+		chatAdapter = new ChatAdapter(this, this.getLayoutInflater(), R.layout.list_item_user_message, R.layout.list_item_contact_message, MESSAGES);
 		chatAdapter.setSender(myNick);
 		listView.setAdapter(chatAdapter);
 		

@@ -128,7 +128,7 @@ public class ChatListActivity extends FragmentActivity implements
 			// adding or replacing the detail fragment using a
 			// fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putSerializable("contact", contact);
+			arguments.putParcelable("contact", contact);
 			ChatDetailFragment fragment = new ChatDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
@@ -141,17 +141,6 @@ public class ChatListActivity extends FragmentActivity implements
 			detailIntent.putExtra("contact", contact);
 			startActivity(detailIntent);
 		}
-	}
-	
-	public void onSendButtonClick(View view) {
-		sendMessage(this, cloud, contact.getPublicKey());
-	}
-
-	public static void sendMessage(Activity activity, Cloud cloud, String contact) {
-		TextView widget = (TextView)activity.findViewById(R.id.editText);
-		String message = widget.getText().toString();
-		cloud.path("chat", "private", contact, System.currentTimeMillis()).pub(message);
-		widget.setText("");
 	}
 	
 	void toast(String message) {

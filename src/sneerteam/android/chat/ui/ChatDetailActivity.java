@@ -1,13 +1,10 @@
 package sneerteam.android.chat.ui;
 
 import sneerteam.android.chat.*;
-import sneerteam.snapi.Cloud;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.*;
-import android.util.Log;
-import android.view.*;
-import android.widget.TextView;
+import android.view.MenuItem;
 
 /**
  * An activity representing a single Chat detail screen. This activity is only
@@ -19,9 +16,6 @@ import android.widget.TextView;
  */
 public class ChatDetailActivity extends FragmentActivity {
 
-	private Contact contact;
-	private Cloud cloud;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -29,8 +23,6 @@ public class ChatDetailActivity extends FragmentActivity {
 
 		// Show the Up button in the action bar.
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		
-		cloud = Cloud.cloudFor(this);
 		
 		// savedInstanceState is non-null when there is fragment state
 		// saved from previous configurations of this activity
@@ -45,8 +37,7 @@ public class ChatDetailActivity extends FragmentActivity {
 			// Create the detail fragment and add it to the activity
 			// using a fragment transaction.
 			Bundle arguments = new Bundle();
-			contact = (Contact) getIntent().getParcelableExtra("contact");
-			arguments.putParcelable("contact", contact);
+			arguments.putParcelable("contact", (Contact) getIntent().getParcelableExtra("contact"));
 			
 			ChatDetailFragment fragment = new ChatDetailFragment();
 			fragment.setArguments(arguments);
@@ -56,20 +47,6 @@ public class ChatDetailActivity extends FragmentActivity {
 		}
 	}
 	
-	@Override
-	protected void onDestroy() {
-		cloud.dispose();
-		super.onDestroy();
-	}
-	
-	public void onSendButtonClick(View view) {
-		ChatListActivity.sendMessage(this, cloud, contact.getPublicKey());
-	}
-	
-	private void log(String string) {
-		Log.d(ChatDetailFragment.class.getSimpleName(), string);
-	}
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
