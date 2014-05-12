@@ -16,8 +16,8 @@ public class Room implements Comparable<Room> {
 	public Room(Cloud cloud, Contact contact) {
 		this.cloud = cloud;
 		this.contact = contact;
-		listenOn(cloud.path(":me", "chat", "private", contact.getPublicKey()), "me").subscribe(messages);
-		listenOn(cloud.path(contact.getPublicKey(), "chat", "private", ":me"), contact.getNickname()).subscribe(messages);
+		listenOn(cloud.path(":me", "chat", "one-on-one", contact.getPublicKey()), "me").subscribe(messages);
+		listenOn(cloud.path(contact.getPublicKey(), "chat", "one-on-one", ":me"), contact.getNickname()).subscribe(messages);
 		messages.subscribe(new Action1<Message>() {@Override public void call(Message msg) {
 			lastTimestamp = Math.max(msg.timestamp(), lastTimestamp);
 		}});
@@ -73,7 +73,7 @@ public class Room implements Comparable<Room> {
 	}
 
 	public void sendMessage(long timestamp, String message) {
-		cloud.path("chat", "private", contact.getPublicKey(), timestamp).pub(message);
+		cloud.path("chat", "one-on-one", contact.getPublicKey(), timestamp).pub(message);
 	}
 
 	public Contact contact() {

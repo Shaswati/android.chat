@@ -26,7 +26,7 @@ public class ChatApp extends Application {
 				}});
 			}}).subscribe(rooms);
 		
-		cloud.path(":me", "chat", "private").children().map(new Func1<PathEvent, String>() {@Override public String call(PathEvent pk) {
+		cloud.path(":me", "chat", "one-on-one").children().map(new Func1<PathEvent, String>() {@Override public String call(PathEvent pk) {
 			return (String) pk.path().lastSegment();
 		}}).subscribe(ids);
 		
