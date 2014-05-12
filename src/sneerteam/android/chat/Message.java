@@ -33,6 +33,10 @@ public class Message implements Comparable<Message> {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM HH:mm");
 		return sdf.format(new Date(timestamp));
 	}
+	
+	public long timestamp() {
+		return timestamp;
+	}
 
 	@Override
 	public int compareTo(Message another) {

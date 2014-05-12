@@ -1,15 +1,16 @@
 package sneerteam.android.chat.ui;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import sneerteam.android.chat.Contact;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import sneerteam.android.chat.Message;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.*;
+
 
 /**
  * A list fragment representing a list of Chats. This fragment also supports
@@ -39,8 +40,8 @@ public class ChatListFragment extends ListFragment {
 	 */
 	private int mActivatedPosition = ListView.INVALID_POSITION;
 	
-	private static List<Contact> CONTACTS = initContacts();
-	private ArrayAdapter<Contact> contactsAdapter;
+	private List<Room> rooms = new ArrayList<Room>();
+	private ArrayAdapter<Room> contactsAdapter;
 
 	/**
 	 * A callback interface that all activities containing this fragment must
@@ -51,7 +52,7 @@ public class ChatListFragment extends ListFragment {
 		/**
 		 * Callback for when an item has been selected.
 		 */
-		public void onItemSelected(Contact contact);
+		public void onItemSelected(Room contact);
 	}
 
 	/**
@@ -60,7 +61,7 @@ public class ChatListFragment extends ListFragment {
 	 */
 	private static Callbacks sDummyCallbacks = new Callbacks() {
 		@Override
-		public void onItemSelected(Contact contact) {
+		public void onItemSelected(Room contact) {
 		}
 	};
 
@@ -75,9 +76,9 @@ public class ChatListFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		contactsAdapter = new ArrayAdapter<Contact>(getActivity(),
+		contactsAdapter = new ArrayAdapter<Room>(getActivity(),
 				android.R.layout.simple_list_item_activated_1,
-				android.R.id.text1, CONTACTS);
+				android.R.id.text1, rooms);
 		setListAdapter(contactsAdapter);
 		
 	}
@@ -97,11 +98,6 @@ public class ChatListFragment extends ListFragment {
 		}
 	}
 	
-	private static List<Contact> initContacts() {
-		List<Contact> contacts = new ArrayList<Contact>();
-		return contacts;
-	}
-
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -130,7 +126,7 @@ public class ChatListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(CONTACTS.get(position));
+		mCallbacks.onItemSelected(rooms.get(position));
 	}
 
 	@Override
@@ -154,14 +150,13 @@ public class ChatListFragment extends ListFragment {
 						: ListView.CHOICE_MODE_NONE);
 	}
 
-	public void addContact(Contact contact) {
-		if (!CONTACTS.contains(contact)) {
-			CONTACTS.add(contact);
-			contactsAdapter.notifyDataSetChanged();
+	public void addRom(Room room) {
+		if (!rooms.contains(room)) {
+			rooms.add(room);
+			room.messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Message>() {@Override public void call(Message msg) {
+				Collections.sort(rooms);
+				contactsAdapter.notifyDataSetChanged();
+			}});
 		}
-	}
-
-	public void contactChanged(Contact contact) {
-		contactsAdapter.notifyDataSetChanged();
 	}
 }

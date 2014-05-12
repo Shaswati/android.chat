@@ -1,18 +1,13 @@
 package sneerteam.android.chat;
 
-import android.os.*;
 
-public class Contact implements Parcelable {
+public class Contact {
 	
 	private String public_key;
 	private String name;
 	private String nickname;
 	
 	public Contact(String public_key, String nickname) {
-		this(public_key, null, nickname);
-	}
-
-	public Contact(String public_key, String name, String nickname) {
 		this.public_key = public_key;
 		this.nickname = nickname;
 	}
@@ -49,11 +44,7 @@ public class Contact implements Parcelable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result
-				+ ((nickname == null) ? 0 : nickname.hashCode());
-		result = prime * result
-				+ ((public_key == null) ? 0 : public_key.hashCode());
+		result = prime * result + ((public_key == null) ? 0 : public_key.hashCode());
 		return result;
 	}
 
@@ -66,16 +57,6 @@ public class Contact implements Parcelable {
 		if (getClass() != obj.getClass())
 			return false;
 		Contact other = (Contact) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (nickname == null) {
-			if (other.nickname != null)
-				return false;
-		} else if (!nickname.equals(other.nickname))
-			return false;
 		if (public_key == null) {
 			if (other.public_key != null)
 				return false;
@@ -83,27 +64,5 @@ public class Contact implements Parcelable {
 			return false;
 		return true;
 	}
-
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(public_key);
-		dest.writeString(name);
-		dest.writeString(nickname);
-	}
-
-	public static final Parcelable.Creator<Contact> CREATOR = new Parcelable.Creator<Contact>() {
-		public Contact createFromParcel(Parcel in) {
-			return new Contact(in.readString(), in.readString(), in.readString());
-		}
-
-		public Contact[] newArray(int size) {
-			return new Contact[size];
-		}
-	};
 
 }

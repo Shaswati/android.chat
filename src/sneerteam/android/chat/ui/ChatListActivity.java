@@ -2,15 +2,12 @@ package sneerteam.android.chat.ui;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import sneerteam.android.chat.Contact;
-import sneerteam.android.chat.R;
-import sneerteam.snapi.Cloud;
+import sneerteam.android.chat.*;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.*;
 import android.widget.Toast;
 
 /**
@@ -41,11 +38,6 @@ public class ChatListActivity extends FragmentActivity implements
 	 */
 	private boolean mTwoPane;
 
-	private Cloud cloud;
-
-	private Contact contact;
-	
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.chat, menu);
@@ -74,14 +66,12 @@ public class ChatListActivity extends FragmentActivity implements
 			if (resultCode == RESULT_OK) {
 				Bundle extras = intent.getExtras();
 				String publicKey = extras.get("public_key").toString();
-				String nickname = extras.get("nickname").toString();
-				final Contact contact = new Contact(publicKey, nickname);
-				chatListFragment.addContact(contact);
-				onItemSelected(contact);
-				cloud.path(publicKey, "info", "name").value().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Object>() {@Override public void call(Object name) {
-					contact.setName((String) name);
-					chatListFragment.contactChanged(contact);
+				
+				ChatApp app = (ChatApp)getApplication();
+				app.room(publicKey).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
+					onItemSelected(room);
 				}});
+
 			}
 		}
 	}
@@ -91,34 +81,22 @@ public class ChatListActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chat_list);
 		
-		cloud = Cloud.cloudFor(this);
+		ChatApp app = (ChatApp)getApplication();
+		app.rooms().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
+			chatListFragment.addRom(room);
+		}});
 		
 		chatListFragment = (ChatListFragment) getSupportFragmentManager().findFragmentById(
 				R.id.chat_list);
 
 		if (findViewById(R.id.chat_detail_container) != null) {
-			// The detail container view will be present only in the
-			// large-screen layouts (res/values-large and
-			// res/values-sw600dp). If this view is present, then the
-			// activity should be in two-pane mode.
 			mTwoPane = true;
-
-			// In two-pane mode, list items should be given the
-			// 'activated' state when touched.
 			chatListFragment.setActivateOnItemClick(true);
 		}
-
-		// TODO: If exposing deep links into your app, handle intents here.
 	}
 	
 	protected void log(String string) {
 		Log.d(ChatListActivity.class.getSimpleName(), string);
-	}
-
-	@Override
-	protected void onDestroy() {
-		cloud.dispose();
-		super.onDestroy();
 	}
 
 	/**
@@ -126,24 +104,18 @@ public class ChatListActivity extends FragmentActivity implements
 	 * the item with the given ID was selected.
 	 */
 	@Override
-	public void onItemSelected(Contact contact) {
-		this.contact = contact;
+	public void onItemSelected(Room room) {
 		if (mTwoPane) {
-			// In two-pane mode, show the detail view in this activity by
-			// adding or replacing the detail fragment using a
-			// fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putParcelable("contact", contact);
+			arguments.putString("room", room.id());
 			ChatDetailFragment fragment = new ChatDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.chat_detail_container, fragment).commit();
 
 		} else {
-			// In single-pane mode, simply start the detail activity
-			// for the selected item ID.
 			Intent detailIntent = new Intent(this, ChatDetailActivity.class);
-			detailIntent.putExtra("contact", contact);
+			detailIntent.putExtra("room", room.id());
 			startActivity(detailIntent);
 		}
 	}
