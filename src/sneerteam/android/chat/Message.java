@@ -91,6 +91,11 @@ public class Message implements Comparable<Message> {
 				return new Message(timestamp, sender, contents);
 			}
 		};
+	}
+
+	@Override
+	public String toString() {
+		return "Message [" + timestamp + " " + sender + ": " + content + "]";
 	}	
 	
 }

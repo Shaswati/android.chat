@@ -110,6 +110,10 @@ public class ChatListActivity extends FragmentActivity implements
 		// TODO: If exposing deep links into your app, handle intents here.
 	}
 	
+	protected void log(String string) {
+		Log.d(ChatListActivity.class.getSimpleName(), string);
+	}
+
 	@Override
 	protected void onDestroy() {
 		cloud.dispose();

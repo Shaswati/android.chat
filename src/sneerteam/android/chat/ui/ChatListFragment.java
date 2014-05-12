@@ -89,8 +89,11 @@ public class ChatListFragment extends ListFragment {
 		// Restore the previously serialized activated item position.
 		if (savedInstanceState != null
 				&& savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
-			setActivatedPosition(savedInstanceState
-					.getInt(STATE_ACTIVATED_POSITION));
+			int position = savedInstanceState
+							.getInt(STATE_ACTIVATED_POSITION);
+			getListView().setItemChecked(position, position != ListView.INVALID_POSITION);
+			
+			mActivatedPosition = position;
 		}
 	}
 	
@@ -149,16 +152,6 @@ public class ChatListFragment extends ListFragment {
 		getListView().setChoiceMode(
 				activateOnItemClick ? ListView.CHOICE_MODE_SINGLE
 						: ListView.CHOICE_MODE_NONE);
-	}
-
-	private void setActivatedPosition(int position) {
-		if (position == ListView.INVALID_POSITION) {
-			getListView().setItemChecked(mActivatedPosition, false);
-		} else {
-			getListView().setItemChecked(position, true);
-		}
-
-		mActivatedPosition = position;
 	}
 
 	public void addContact(Contact contact) {

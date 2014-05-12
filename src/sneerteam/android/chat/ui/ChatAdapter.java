@@ -1,30 +1,28 @@
 package sneerteam.android.chat.ui;
 
-import android.annotation.*;
-import android.app.*;
-import android.content.*;
-import android.graphics.*;
+import java.util.*;
+
+import sneerteam.android.chat.*;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.*;
 import android.view.*;
 import android.widget.*;
 
-import java.util.*;
-
-import sneerteam.android.chat.*;
-
 public class ChatAdapter extends ArrayAdapter<Message>{
 
-    Context context; 
     int layoutUserResourceId;    
     int listContactResourceId;
     List<Message> data = null;
 	private String sender;
+	private LayoutInflater inflater;
     
-    public ChatAdapter(Context context, int layoutUserResourceId, int listContactResourceId, List<Message> data) {
+    public ChatAdapter(Context context, LayoutInflater inflater, int layoutUserResourceId, int listContactResourceId, List<Message> data) {
         super(context, layoutUserResourceId, data);
+		this.inflater = inflater;
         this.layoutUserResourceId = layoutUserResourceId;
         this.listContactResourceId = listContactResourceId;
-        this.context = context;
         this.data = data;
     }
 
@@ -35,7 +33,6 @@ public class ChatAdapter extends ArrayAdapter<Message>{
         
         Message message = data.get(position);
         
-        LayoutInflater inflater = ((Activity)context).getLayoutInflater();
         if (isMine(message))
         	row = inflater.inflate(layoutUserResourceId, parent, false);
         else
