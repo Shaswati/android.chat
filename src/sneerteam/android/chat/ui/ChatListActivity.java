@@ -2,15 +2,14 @@ package sneerteam.android.chat.ui;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import sneerteam.android.chat.Contact;
-import sneerteam.android.chat.R;
+import sneerteam.android.chat.*;
 import sneerteam.snapi.Cloud;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.*;
-import android.widget.*;
+import android.widget.Toast;
 
 /**
  * An activity representing a list of Chats. This activity has different
