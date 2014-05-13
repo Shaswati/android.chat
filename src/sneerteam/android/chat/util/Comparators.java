@@ -1,4 +1,4 @@
-package sneerteam.android.chat.ui;
+package sneerteam.android.chat.util;
 
 public class Comparators {
 

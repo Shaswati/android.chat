@@ -4,7 +4,7 @@ import java.util.*;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import sneerteam.android.chat.Message;
+import sneerteam.android.chat.*;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;

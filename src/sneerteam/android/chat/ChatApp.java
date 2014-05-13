@@ -3,7 +3,6 @@ package sneerteam.android.chat;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.subjects.*;
-import sneerteam.android.chat.ui.Room;
 import sneerteam.snapi.*;
 import android.app.Application;
 
