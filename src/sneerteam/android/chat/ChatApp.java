@@ -26,6 +26,12 @@ public class ChatApp extends Application {
 				}});
 			}}).subscribe(rooms);
 		
+		cloud.path(":me", "contacts").children().flatMap(new Func1<PathEvent, Observable<PathEvent>>() {@Override public Observable<PathEvent> call(PathEvent pk) {
+			return cloud.path(pk.path().lastSegment(), "chat", "one-on-one", ":me").children().first();
+		}}).map(new Func1<PathEvent, String>() {@Override public String call(PathEvent pk) {
+			return (String) pk.path().segments().get(0);
+		}}).subscribe(ids);
+		
 		cloud.path(":me", "chat", "one-on-one").children().map(new Func1<PathEvent, String>() {@Override public String call(PathEvent pk) {
 			return (String) pk.path().lastSegment();
 		}}).subscribe(ids);
