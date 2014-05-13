@@ -1,7 +1,7 @@
 package sneerteam.android.chat;
 
 import rx.Observable;
-import rx.functions.Func1;
+import rx.functions.*;
 import rx.subjects.*;
 import sneerteam.snapi.*;
 import android.app.Application;
@@ -10,14 +10,14 @@ public class ChatApp extends Application {
 	
 	private Cloud cloud;
 	private ReplaySubject<Room> rooms = ReplaySubject.create();
-	private PublishSubject<String> ids = PublishSubject.create();
+	private PublishSubject<String> oneOnOnePublicKeys = PublishSubject.create();
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		cloud = Cloud.cloudFor(this);
 
-		ids.distinct()
+		oneOnOnePublicKeys.distinct()
 			.flatMap(new Func1<String, Observable<Room>>() {@Override public Observable<Room> call(final String pk) {
 				return cloud.path(":me", "contacts", pk, "nickname").value().map(new Func1<Object, Room>() {@Override public Room call(Object nickname) {
             		Contact contact = new Contact((String) pk, (String) nickname);
@@ -29,11 +29,11 @@ public class ChatApp extends Application {
 			return cloud.path(pk.path().lastSegment(), "chat", "one-on-one", ":me").children().first();
 		}}).map(new Func1<PathEvent, String>() {@Override public String call(PathEvent pk) {
 			return (String) pk.path().segments().get(0);
-		}}).subscribe(ids);
+		}}).subscribe(oneOnOnePublicKeys);
 		
 		cloud.path(":me", "chat", "one-on-one").children().map(new Func1<PathEvent, String>() {@Override public String call(PathEvent pk) {
 			return (String) pk.path().lastSegment();
-		}}).subscribe(ids);
+		}}).subscribe(oneOnOnePublicKeys);
 		
 	}
 	
@@ -42,7 +42,7 @@ public class ChatApp extends Application {
 	}
 
 	public Observable<Room> room(final String publicKey) {
-		ids.onNext(publicKey);
+		oneOnOnePublicKeys.onNext(publicKey);
 		return rooms.filter(new Func1<Room, Boolean>() {@Override public Boolean call(Room room) {
 			return publicKey.equals(room.contact().getPublicKey());
 		}}).first();

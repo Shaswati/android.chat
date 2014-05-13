@@ -3,7 +3,6 @@ package sneerteam.android.chat;
 import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
-import sneerteam.android.chat.*;
 import sneerteam.android.chat.util.Comparators;
 import sneerteam.snapi.*;
 
