@@ -13,7 +13,7 @@ It will clone/pull all sneerteam projects into the current folder. Run it whenev
 - Run android.main
 - Run android.chat :)
 
-TODO
+To Do
 ====
 
-see https://trello.com/b/lEdEIxxA/sneer
+See https://trello.com/b/lEdEIxxA/sneer
