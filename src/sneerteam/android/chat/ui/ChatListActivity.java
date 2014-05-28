@@ -1,14 +1,16 @@
 package sneerteam.android.chat.ui;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
+import rx.android.schedulers.*;
+import rx.functions.*;
 import sneerteam.android.chat.*;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.util.Log;
+import sneerteam.android.chat.R;
+import sneerteam.snapi.*;
+import android.content.*;
+import android.os.*;
+import android.support.v4.app.*;
+import android.util.*;
 import android.view.*;
-import android.widget.Toast;
+import android.widget.*;
 
 /**
  * An activity representing a list of Chats. This activity has different
@@ -28,8 +30,6 @@ import android.widget.Toast;
 public class ChatListActivity extends FragmentActivity implements
 		ChatListFragment.Callbacks {
 	
-	private static final int PICK_CONTACT_REQUEST = 100;
-	
 	private static ChatListFragment chatListFragment;
 
 	/**
@@ -37,6 +37,8 @@ public class ChatListActivity extends FragmentActivity implements
 	 * device.
 	 */
 	private boolean mTwoPane;
+
+	private ContactPicker contactPicker;
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -48,32 +50,22 @@ public class ChatListActivity extends FragmentActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.action_contacts:
-				pickContact();
+				contactPicker = new ContactPicker();
+				contactPicker.pickContact(this).subscribe(new Action1<String>() {@Override public void call(String publicKey) {
+					ChatApp app = (ChatApp)getApplication();
+					app.room(publicKey).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
+						onItemSelected(room);
+					}});
+				}});
 				break;
 		}
 		return true;
 	}
 	
-	private void pickContact() {
-		Intent intent = new Intent("sneerteam.intent.action.PICK_CONTACT");
-		startActivityForResult(intent, PICK_CONTACT_REQUEST);
-	}
-	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-		if (requestCode == PICK_CONTACT_REQUEST) {
-			if (resultCode == RESULT_OK) {
-				Bundle extras = intent.getExtras();
-				String publicKey = extras.get("public_key").toString();
-				
-				ChatApp app = (ChatApp)getApplication();
-				app.room(publicKey).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
-					onItemSelected(room);
-				}});
-
-			}
-		}
+		contactPicker.onActivityResult(requestCode, resultCode, intent);
 	}
 
 	@Override
