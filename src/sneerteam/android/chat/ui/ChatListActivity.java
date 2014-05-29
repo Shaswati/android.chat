@@ -38,42 +38,43 @@ public class ChatListActivity extends FragmentActivity implements
 	 */
 	private boolean mTwoPane;
 
-	private ContactPicker contactPicker;
+	private int currentContactRequestId;
 
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.chat, menu);
 		return true;
 	}
 
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.action_contacts:
-				contactPicker = new ContactPicker();
-				contactPicker.pickContact(this).subscribe(new Action1<String>() {@Override public void call(String publicKey) {
-					ChatApp app = (ChatApp)getApplication();
-					app.room(publicKey).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
-						onItemSelected(room);
-					}});
-				}});
-				break;
-		}
+		if (item.getItemId() == R.id.action_contacts)
+			ContactPicker.startActivityForResult(this, ++currentContactRequestId);
 		return true;
 	}
+	
 	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-		contactPicker.onActivityResult(requestCode, resultCode, intent);
+		if (requestCode != RESULT_OK) return;
+		if (requestCode != currentContactRequestId) return;
+		
+		String publicKey = ContactPicker.publicKeyFrom(intent);
+		chatApp().room(publicKey).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
+			onItemSelected(room);
+		}});
 	}
 
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chat_list);
 		
-		ChatApp app = (ChatApp)getApplication();
+		ChatApp app = chatApp();
 		app.rooms().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
 			chatListFragment.addRom(room);
 		}});
@@ -87,10 +88,12 @@ public class ChatListActivity extends FragmentActivity implements
 		}
 	}
 	
+	
 	protected void log(String string) {
 		Log.d(ChatListActivity.class.getSimpleName(), string);
 	}
 
+	
 	/**
 	 * Callback method from {@link ChatListFragment.Callbacks} indicating that
 	 * the item with the given ID was selected.
@@ -111,6 +114,12 @@ public class ChatListActivity extends FragmentActivity implements
 			startActivity(detailIntent);
 		}
 	}
+	
+	
+	private ChatApp chatApp() {
+		return (ChatApp)getApplication();
+	}
+
 	
 	void toast(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_LONG).show();

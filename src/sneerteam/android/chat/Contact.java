@@ -3,49 +3,29 @@ package sneerteam.android.chat;
 
 public class Contact {
 	
-	private String public_key;
-	private String name;
-	private String nickname;
+	private final String publicKey;
+	private final String nickname;
 	
-	public Contact(String public_key, String nickname) {
-		this.public_key = public_key;
+	public Contact(String publicKey, String nickname) {
+		this.publicKey = publicKey;
 		this.nickname = nickname;
 	}
 
 	public String getPublicKey() {
-		return public_key;
+		return publicKey;
 	}
 	
-	public void setPublicKey(String public_key) {
-		this.public_key = public_key;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public String getNickname() {
 		return nickname;
 	}
 
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
-	}
-	
 	@Override public String toString() {
 		return nickname;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((public_key == null) ? 0 : public_key.hashCode());
-		return result;
+		return publicKey.hashCode();
 	}
 
 	@Override
@@ -57,10 +37,10 @@ public class Contact {
 		if (getClass() != obj.getClass())
 			return false;
 		Contact other = (Contact) obj;
-		if (public_key == null) {
-			if (other.public_key != null)
+		if (publicKey == null) {
+			if (other.publicKey != null)
 				return false;
-		} else if (!public_key.equals(other.public_key))
+		} else if (!publicKey.equals(other.publicKey))
 			return false;
 		return true;
 	}
