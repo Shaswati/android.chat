@@ -5,7 +5,6 @@ import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
 import sneerteam.snapi.*;
-import us.bpsm.edn.*;
 import android.app.Application;
 
 public class ChatApp extends Application {

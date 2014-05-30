@@ -6,7 +6,6 @@ import rx.functions.*;
 import rx.subjects.*;
 import sneerteam.android.chat.util.Comparators;
 import sneerteam.snapi.*;
-import us.bpsm.edn.*;
 
 public class Room implements Comparable<Room> {
 	
