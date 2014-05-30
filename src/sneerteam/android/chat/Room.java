@@ -1,10 +1,12 @@
 package sneerteam.android.chat;
 
+import static sneerteam.snapi.CloudPath.*;
 import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
 import sneerteam.android.chat.util.Comparators;
 import sneerteam.snapi.*;
+import us.bpsm.edn.*;
 
 public class Room implements Comparable<Room> {
 	
@@ -16,8 +18,8 @@ public class Room implements Comparable<Room> {
 	public Room(Cloud cloud, Contact contact) {
 		this.cloud = cloud;
 		this.contact = contact;
-		listenOn(cloud.path(":me", "chat", "one-on-one", contact.getPublicKey()), "me").subscribe(messages);
-		listenOn(cloud.path(contact.getPublicKey(), "chat", "one-on-one", ":me"), contact.getNickname()).subscribe(messages);
+		listenOn(cloud.path(ME, "chat", "one-on-one", contact.getPublicKey()), "me").subscribe(messages);
+		listenOn(cloud.path(contact.getPublicKey(), "chat", "one-on-one", ME), contact.getNickname()).subscribe(messages);
 		messages.subscribe(new Action1<Message>() {@Override public void call(Message msg) {
 			lastTimestamp = Math.max(msg.timestamp(), lastTimestamp);
 		}});
