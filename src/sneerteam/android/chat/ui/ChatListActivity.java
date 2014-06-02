@@ -70,6 +70,8 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chat_list);
 		
+        SneerUtils.showSneerInstallationMessageIfNecessary(this);
+		
 		ChatApp app = chatApp();
 		app.rooms().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
 			chatListFragment.addRom(room);
