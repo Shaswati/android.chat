@@ -55,7 +55,7 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-		if (requestCode != RESULT_OK) return;
+		if (resultCode != RESULT_OK) return;
 		if (requestCode != PICK_CONTACT_REQUEST) return;
 		
 		String publicKey = ContactPicker.publicKeyFrom(intent);
