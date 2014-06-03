@@ -5,6 +5,7 @@ import rx.functions.*;
 import sneerteam.android.chat.*;
 import sneerteam.android.chat.R;
 import sneerteam.snapi.*;
+import sneerteam.snapi.Contact;
 import android.content.*;
 import android.os.*;
 import android.support.v4.app.*;
@@ -58,8 +59,8 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 		if (resultCode != RESULT_OK) return;
 		if (requestCode != PICK_CONTACT_REQUEST) return;
 		
-		String publicKey = ContactPicker.publicKeyFrom(intent);
-		chatApp().room(publicKey).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
+		Contact contact = ContactPicker.contactFrom(intent);
+		chatApp().room(contact.publicKey()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
 			onItemSelected(room);
 		}});
 	}
