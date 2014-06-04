@@ -31,7 +31,6 @@ import android.widget.*;
 public class ChatListActivity extends FragmentActivity implements ChatListFragment.Callbacks {
 	
 	private static ChatListFragment chatListFragment;
-	private static final int PICK_CONTACT_REQUEST = 100;
 
 	/** Whether or not the activity is in two-pane mode, i.e. running on a tablet device. */
 	private boolean mTwoPane;
@@ -48,23 +47,14 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.action_contacts)
-			ContactPicker.startActivityForResult(this, PICK_CONTACT_REQUEST);
+			ContactPicker.pickContact(this).subscribe(new Action1<Contact>() {@Override public void call(Contact contact) {
+			    chatApp().room(contact.publicKey()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
+			        onItemSelected(room);
+			    }});
+            }});
 		return true;
 	}
 	
-	
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		super.onActivityResult(requestCode, resultCode, intent);
-		if (resultCode != RESULT_OK) return;
-		if (requestCode != PICK_CONTACT_REQUEST) return;
-		
-		Contact contact = ContactPicker.contactFrom(intent);
-		chatApp().room(contact.publicKey()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
-			onItemSelected(room);
-		}});
-	}
-
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
