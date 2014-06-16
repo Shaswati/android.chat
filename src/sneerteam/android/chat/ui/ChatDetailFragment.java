@@ -47,7 +47,6 @@ public class ChatDetailFragment extends Fragment {
 	
 	private static List<Message> createInitialMessages() {
 		List<Message> messages = new ArrayList<Message>();
-		messages.add(new Message(0, "Sneer", "Welcome to Sneer chat. Be awesome."));
 		return messages;
 	}
 	
