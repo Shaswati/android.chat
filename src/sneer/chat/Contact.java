@@ -1,4 +1,4 @@
-package sneer.android.chat;
+package sneer.chat;
 
 
 public class Contact {

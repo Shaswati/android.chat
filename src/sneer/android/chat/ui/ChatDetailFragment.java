@@ -6,6 +6,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.subjects.ReplaySubject;
 import sneer.android.chat.*;
+import sneer.chat.*;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Pair;

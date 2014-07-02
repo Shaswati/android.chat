@@ -1,10 +1,10 @@
-package sneer.android.chat.impl;
+package sneer.chat.impl;
 import static sneerteam.snapi.CloudPath.*;
 import rx.*;
 import rx.functions.*;
 import rx.subjects.*;
-import sneer.android.chat.*;
-import sneer.android.chat.Contact;
+import sneer.chat.*;
+import sneer.chat.Contact;
 import sneerteam.snapi.*;
 import android.content.*;
 

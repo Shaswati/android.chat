@@ -1,10 +1,10 @@
 package sneer.android.chat.ui;
 
 import sneer.android.chat.*;
-import android.content.Intent;
-import android.os.Bundle;
+import android.content.*;
+import android.os.*;
 import android.support.v4.app.*;
-import android.view.MenuItem;
+import android.view.*;
 
 /**
  * An activity representing a single Chat detail screen. This activity is only

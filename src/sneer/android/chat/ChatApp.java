@@ -1,6 +1,7 @@
 package sneer.android.chat;
 
-import sneer.android.chat.impl.*;
+import sneer.chat.*;
+import sneer.chat.impl.*;
 import android.app.*;
 
 public class ChatApp extends Application {

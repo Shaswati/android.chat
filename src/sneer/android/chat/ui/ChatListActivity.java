@@ -4,6 +4,7 @@ import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.android.chat.*;
 import sneer.android.chat.R;
+import sneer.chat.*;
 import sneerteam.snapi.*;
 import sneerteam.snapi.Contact;
 import android.content.*;

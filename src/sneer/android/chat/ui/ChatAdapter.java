@@ -3,6 +3,7 @@ package sneer.android.chat.ui;
 import java.util.*;
 
 import sneer.android.chat.*;
+import sneer.chat.*;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;

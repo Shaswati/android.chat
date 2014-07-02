@@ -1,10 +1,10 @@
-package sneer.android.chat;
+package sneer.chat;
 
 import static sneerteam.snapi.CloudPath.*;
 import rx.Observable;
 import rx.functions.*;
 import rx.subjects.*;
-import sneer.android.chat.util.*;
+import sneer.chat.util.*;
 import sneerteam.snapi.*;
 
 public class Room implements Comparable<Room> {
