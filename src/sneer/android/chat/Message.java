@@ -1,4 +1,4 @@
-package sneerteam.android.chat;
+package sneer.android.chat;
 
 import android.annotation.SuppressLint;
 

@@ -1,4 +1,4 @@
-package sneerteam.android.chat.ui;
+package sneer.android.chat.ui;
 
 import android.graphics.ColorFilter;
 import android.graphics.Paint;

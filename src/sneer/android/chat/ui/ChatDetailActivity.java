@@ -1,6 +1,6 @@
-package sneerteam.android.chat.ui;
+package sneer.android.chat.ui;
 
-import sneerteam.android.chat.*;
+import sneer.android.chat.*;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.*;

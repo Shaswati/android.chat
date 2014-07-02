@@ -1,9 +1,9 @@
-package sneerteam.android.chat.ui;
+package sneer.android.chat.ui;
 
 import rx.android.schedulers.*;
 import rx.functions.*;
-import sneerteam.android.chat.*;
-import sneerteam.android.chat.R;
+import sneer.android.chat.*;
+import sneer.android.chat.R;
 import sneerteam.snapi.*;
 import sneerteam.snapi.Contact;
 import android.content.*;

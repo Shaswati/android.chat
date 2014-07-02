@@ -1,7 +1,7 @@
-package sneerteam.android.chat.simulator;
+package sneer.android.chat.simulator;
 
 import rx.*;
-import sneerteam.android.chat.*;
+import sneer.android.chat.*;
 
 public class ChatSimulator implements Chat {
 

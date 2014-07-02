@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/chat_list"
-        android:name="sneerteam.android.chat.ui.ChatListFragment"
+        android:name="sneer.android.chat.ui.ChatListFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"

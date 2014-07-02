@@ -1,11 +1,11 @@
-package sneerteam.android.chat.ui;
+package sneer.android.chat.ui;
 
 import java.util.*;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.subjects.ReplaySubject;
-import sneerteam.android.chat.*;
+import sneer.android.chat.*;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Pair;
