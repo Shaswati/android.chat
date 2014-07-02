@@ -17,10 +17,10 @@ public class ChatImpl implements Chat {
 		final Cloud cloud = Cloud.cloudFor(context);
 
 		oneOnOnePublicKeys.distinct()
-			.flatMap(new Func1<String, Observable<Room>>() {@Override public Observable<Room> call(final String pk) {
-				return cloud.path(ME, "contacts", pk, "nickname").value().map(new Func1<Object, Room>() {@Override public Room call(Object nickname) {
+			.flatMap(new Func1<String, Observable<RoomImpl>>() {@Override public Observable<RoomImpl> call(final String pk) {
+				return cloud.path(ME, "contacts", pk, "nickname").value().map(new Func1<Object, RoomImpl>() {@Override public RoomImpl call(Object nickname) {
             		Contact contact = new Contact((String) pk, (String) nickname);
-					return new Room(cloud, contact);
+					return new RoomImpl(cloud, contact);
 				}});
 			}}).subscribe(rooms);
 		
@@ -44,10 +44,8 @@ public class ChatImpl implements Chat {
 	public Observable<Room> room(final String publicKey) {
 		oneOnOnePublicKeys.onNext(publicKey);
 		return rooms.filter(new Func1<Room, Boolean>() {@Override public Boolean call(Room room) {
-			return publicKey.equals(room.contact().getPublicKey());
+			return publicKey.equals(room.publicKey());
 		}}).first();
-		
-
 	}
 
 }

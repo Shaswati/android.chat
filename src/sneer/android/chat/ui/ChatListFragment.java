@@ -2,13 +2,14 @@ package sneer.android.chat.ui;
 
 import java.util.*;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
+import rx.android.schedulers.*;
+import rx.functions.*;
 import sneer.chat.*;
-import android.app.Activity;
-import android.os.Bundle;
+import sneer.chat.Message;
+import android.app.*;
+import android.os.*;
 import android.support.v4.app.ListFragment;
-import android.view.View;
+import android.view.*;
 import android.widget.*;
 
 
@@ -150,10 +151,10 @@ public class ChatListFragment extends ListFragment {
 						: ListView.CHOICE_MODE_NONE);
 	}
 
-	public void addRom(Room room) {
-		if (!rooms.contains(room)) {
-			rooms.add(room);
-			room.messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Message>() {@Override public void call(Message msg) {
+	public void addRom(Room Room) {
+		if (!rooms.contains(Room)) {
+			rooms.add(Room);
+			Room.messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Message>() {@Override public void call(Message msg) {
 				Collections.sort(rooms);
 				contactsAdapter.notifyDataSetChanged();
 			}});

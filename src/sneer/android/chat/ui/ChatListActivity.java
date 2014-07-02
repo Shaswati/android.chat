@@ -92,7 +92,7 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	public void onItemSelected(Room room) {
 		if (mTwoPane) {
 			Bundle arguments = new Bundle();
-			arguments.putString("room", room.id());
+			arguments.putString("room", room.publicKey());
 			ChatDetailFragment fragment = new ChatDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
@@ -100,7 +100,7 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 
 		} else {
 			Intent detailIntent = new Intent(this, ChatDetailActivity.class);
-			detailIntent.putExtra("room", room.id());
+			detailIntent.putExtra("room", room.publicKey());
 			startActivity(detailIntent);
 		}
 	}

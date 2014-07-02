@@ -2,14 +2,15 @@ package sneer.android.chat.ui;
 
 import java.util.*;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.subjects.ReplaySubject;
+import rx.android.schedulers.*;
+import rx.functions.*;
+import rx.subjects.*;
 import sneer.android.chat.*;
 import sneer.chat.*;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Pair;
+import sneer.chat.Message;
+import android.os.*;
+import android.support.v4.app.*;
+import android.util.*;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
