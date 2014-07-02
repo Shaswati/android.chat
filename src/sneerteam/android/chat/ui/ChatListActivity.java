@@ -63,7 +63,7 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 		
         SneerUtils.showSneerInstallationMessageIfNecessary(this);
 		
-		ChatApp app = chatApp();
+		Chat app = chatApp();
 		app.rooms().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
 			chatListFragment.addRom(room);
 		}});
@@ -105,8 +105,8 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	}
 	
 	
-	private ChatApp chatApp() {
-		return (ChatApp)getApplication();
+	private Chat chatApp() {
+		return ((ChatApp)getApplication()).model();
 	}
 
 	

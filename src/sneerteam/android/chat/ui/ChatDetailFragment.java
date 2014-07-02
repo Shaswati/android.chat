@@ -54,7 +54,7 @@ public class ChatDetailFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_chat_detail, container, false);
 
-		ChatApp app = (ChatApp) getActivity().getApplication();
+		Chat app = ((ChatApp) getActivity().getApplication()).model();
 		app.room(getArguments().getString("room")).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(final Room room) {
 
 			getActivity().setTitle(room.contact().getNickname());
