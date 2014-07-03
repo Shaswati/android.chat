@@ -22,6 +22,7 @@ import android.widget.*;
  * {@link ChatDetailActivity} on handsets.
  */
 public class ChatDetailFragment extends Fragment {
+	static final String CONTACT_PUK = "contactPuk";
 	/**
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
@@ -56,24 +57,21 @@ public class ChatDetailFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_chat_detail, container, false);
 
-		Chat app = ((ChatApp) getActivity().getApplication()).model();
-		app.room(getArguments().getString("room")).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(final Room room) {
+		Chat chat = ((ChatApp) getActivity().getApplication()).model();
+		final Room room = chat.findRoom(getArguments().getString(CONTACT_PUK));
 
-			getActivity().setTitle(room.contact().getNickname());
+		getActivity().setTitle(room.contact().nickname());
 			
-			sendSubject.subscribe(new Action1<Pair<Long, String>>() {@Override public void call(Pair<Long, String> msg) {
-				room.sendMessage(msg.first, msg.second);
-			}});
-			
-			room.messages().observeOn(AndroidSchedulers.mainThread())
-			.subscribe(new Action1<Message>() {@Override public void call(Message msg) {
-				onMessage(msg);
-			}});
+		sendSubject.subscribe(new Action1<Pair<Long, String>>() {@Override public void call(Pair<Long, String> msg) {
+			room.sendMessage(msg.first, msg.second);
 		}});
-
+			
+		room.messages().observeOn(AndroidSchedulers.mainThread())
+		.subscribe(new Action1<Message>() {@Override public void call(Message msg) {
+			onMessage(msg);
+		}});
 		
 		chatAdapter = new ChatAdapter(this.getActivity(), inflater, R.layout.list_item_user_message, R.layout.list_item_contact_message, messages);
-		chatAdapter.setSender("me");
 
 		ListView listView = (ListView) rootView.findViewById(R.id.listView);
 		listView.setAdapter(chatAdapter);

@@ -16,7 +16,6 @@ public class ChatAdapter extends ArrayAdapter<Message>{
     int layoutUserResourceId;    
     int listContactResourceId;
     List<Message> data = null;
-	private String sender;
 	private LayoutInflater inflater;
     
     public ChatAdapter(Context context, LayoutInflater inflater, int layoutUserResourceId, int listContactResourceId, List<Message> data) {
@@ -34,10 +33,8 @@ public class ChatAdapter extends ArrayAdapter<Message>{
         
         Message message = data.get(position);
         
-        if (isMine(message))
-        	row = inflater.inflate(layoutUserResourceId, parent, false);
-        else
-        	row = inflater.inflate(listContactResourceId, parent, false);
+        int resourceId = message.isOwn() ? layoutUserResourceId : listContactResourceId;
+        row = inflater.inflate(resourceId, parent, false);
         
         RelativeLayout speechBubble = (RelativeLayout)row.findViewById(R.id.speechBubble);
         TextView messageContent = (TextView)row.findViewById(R.id.messageContent);
@@ -46,7 +43,10 @@ public class ChatAdapter extends ArrayAdapter<Message>{
         
         messageContent.setText(message.content());
         messageSender.setText(message.sender());
-        if (!isMine(message)) {
+        if (message.isOwn()) {
+        	View speechBubbleArrowRight = row.findViewById(R.id.speechBubbleArrowRight);
+        	speechBubbleArrowRight.setBackground(new TriangleRightDrawable(Color.parseColor("#D34F39")));
+        } else {
         	messageSender.setTextColor(darkColorDeterminedBy(message.sender()));
         	
         	View speechBubbleArrowLeft = row.findViewById(R.id.speechBubbleArrowLeft);
@@ -58,9 +58,6 @@ public class ChatAdapter extends ArrayAdapter<Message>{
         	
         	GradientDrawable bubbleShadow = (GradientDrawable) bubbleLayer.findDrawableByLayerId(R.id.bubbleShadow);
         	bubbleShadow.setColor(darkColorDeterminedBy(message.sender()));
-        } else {
-        	View speechBubbleArrowRight = row.findViewById(R.id.speechBubbleArrowRight);
-        	speechBubbleArrowRight.setBackground(new TriangleRightDrawable(Color.parseColor("#D34F39")));
         }
         
         messageTime.setText(message.time());
@@ -68,18 +65,6 @@ public class ChatAdapter extends ArrayAdapter<Message>{
         return row;
     }
 
-	private boolean isMine(Message message) {
-		return sender != null && sender.equals(message.sender());
-	}
-    
-	public boolean hasSender() {
-		return sender != null;
-	}
-
-	public void setSender(String sender) {
-		this.sender = sender;
-	}
-	
 	private static int darkColorDeterminedBy(String string) {
 		return colorDeterminedBy(string, 50);
 	}

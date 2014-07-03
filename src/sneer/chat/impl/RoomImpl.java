@@ -1,11 +1,10 @@
 package sneer.chat.impl;
 
 import static sneerteam.snapi.CloudPath.*;
-import rx.Observable;
+import rx.*;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.chat.*;
-import sneer.chat.Contact;
 import sneer.chat.util.*;
 import sneerteam.snapi.*;
 
@@ -19,8 +18,8 @@ public class RoomImpl implements Room {
 	public RoomImpl(Cloud cloud, Contact contact) {
 		this.cloud = cloud;
 		this.contact = contact;
-		listenOn(cloud.path(ME, "chat", "one-on-one", contact.getPublicKey()), "me").subscribe(messages);
-		listenOn(cloud.path(contact.getPublicKey(), "chat", "one-on-one", ME), contact.getNickname()).subscribe(messages);
+		listenOn(cloud.path(ME, "chat", "one-on-one", contact.publicKey()), "me").subscribe(messages);
+		listenOn(cloud.path(contact.publicKey(), "chat", "one-on-one", ME), contact.nickname()).subscribe(messages);
 		messages.subscribe(new Action1<Message>() {@Override public void call(Message msg) {
 			lastMessageTimestamp = Math.max(msg.timestamp(), lastMessageTimestamp);
 		}});
@@ -63,7 +62,7 @@ public class RoomImpl implements Room {
 
 	@Override
 	public String toString() {
-		return contact.getNickname();
+		return contact.nickname();
 	}
 
 	@Override
@@ -83,7 +82,7 @@ public class RoomImpl implements Room {
 	
 	@Override
 	public void sendMessage(long timestamp, String message) {
-		cloud.path("chat", "one-on-one", contact.getPublicKey(), timestamp).pub(message);
+		cloud.path("chat", "one-on-one", contact.publicKey(), timestamp).pub(message);
 	}
 
 	@Override
@@ -93,7 +92,7 @@ public class RoomImpl implements Room {
 
 	@Override
 	public String publicKey() {
-		return contact.getPublicKey();
+		return contact.publicKey();
 	}
 	
 }

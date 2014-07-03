@@ -9,17 +9,30 @@ import rx.functions.*;
 
 public class Message implements Comparable<Message> {
 	
-	private String content;
-	private String sender;
+	private final String content;
+	private final String sender;
 	
-	private long timestamp;
+	private final long timestamp;
+	private final boolean isOwn;
+	
+	public Message(long timestamp, String content) {
+		this.timestamp = timestamp;
+		this.sender = null;
+		this.content = content;
+		this.isOwn = true;
+	}
 	
 	public Message(long timestamp, String sender, String content) {
 		this.timestamp = timestamp;
 		this.sender = sender;
 		this.content = content;
+		this.isOwn = false;
 	}
 
+	public boolean isOwn() {
+		return isOwn;
+	}
+	
 	public String sender() {
 		return sender;
 	}

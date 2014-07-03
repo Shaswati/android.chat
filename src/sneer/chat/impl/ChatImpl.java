@@ -4,17 +4,18 @@ import rx.*;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.chat.*;
-import sneer.chat.Contact;
 import sneerteam.snapi.*;
 import android.content.*;
 
 public class ChatImpl implements Chat {
 	
+	private final Context context;
 	private final ReplaySubject<Room> rooms = ReplaySubject.create();
 	private final PublishSubject<String> oneOnOnePublicKeys = PublishSubject.create();
 
-	public ChatImpl(Context context){
-		final Cloud cloud = Cloud.cloudFor(context);
+	public ChatImpl(Context context) {
+		this.context = context;
+		final Cloud cloud = Cloud.cloudFor(this.context);
 
 		oneOnOnePublicKeys.distinct()
 			.flatMap(new Func1<String, Observable<RoomImpl>>() {@Override public Observable<RoomImpl> call(final String pk) {
@@ -41,11 +42,26 @@ public class ChatImpl implements Chat {
 	}
 
 	@Override
-	public Observable<Room> room(final String publicKey) {
-		oneOnOnePublicKeys.onNext(publicKey);
-		return rooms.filter(new Func1<Room, Boolean>() {@Override public Boolean call(Room room) {
-			return publicKey.equals(room.publicKey());
-		}}).first();
+	public Room produceRoomWith(final Contact contact) {
+//		oneOnOnePublicKeys.onNext(publicKey);
+//		return rooms.filter(new Func1<Room, Boolean>() {@Override public Boolean call(Room room) {
+//			return publicKey.equals(room.publicKey());
+//		}}).first();
+		
+		
+		// Creates a new Room or returns an existing one
+		return null;
+	}
+
+	@Override
+	public Room findRoom(String contactPuk) {
+		// Throws an exception if the Room is not found
+		return null;
+	}
+
+	@Override
+	public Observable<Contact> pickContact() {
+		return ContactPicker.pickContact(context);
 	}
 
 }

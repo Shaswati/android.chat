@@ -1,11 +1,14 @@
 package sneer.chat;
 
 import rx.*;
+import sneerteam.snapi.*;
 
 public interface Chat {
 
-	Observable<Room> rooms();
+	Observable<Contact> pickContact();
 
-	Observable<Room> room(String publicKey);
+	Observable<Room> rooms();
+	Room produceRoomWith(Contact contact);
+	Room findRoom(String contactPuk);
 
 }

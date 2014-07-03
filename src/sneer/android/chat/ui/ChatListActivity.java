@@ -6,7 +6,6 @@ import sneer.android.chat.*;
 import sneer.android.chat.R;
 import sneer.chat.*;
 import sneerteam.snapi.*;
-import sneerteam.snapi.Contact;
 import android.content.*;
 import android.os.*;
 import android.support.v4.app.*;
@@ -48,10 +47,8 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.action_contacts)
-			ContactPicker.pickContact(this).subscribe(new Action1<Contact>() {@Override public void call(Contact contact) {
-			    chatApp().room(contact.publicKey()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
-			        onItemSelected(room);
-			    }});
+			chatApp().pickContact().subscribe(new Action1<Contact>() {@Override public void call(Contact contact) {
+				onItemSelected(chatApp().produceRoomWith(contact));
             }});
 		return true;
 	}
@@ -92,7 +89,7 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	public void onItemSelected(Room room) {
 		if (mTwoPane) {
 			Bundle arguments = new Bundle();
-			arguments.putString("room", room.publicKey());
+			arguments.putString(ChatDetailFragment.CONTACT_PUK, room.publicKey());
 			ChatDetailFragment fragment = new ChatDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
@@ -100,12 +97,12 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 
 		} else {
 			Intent detailIntent = new Intent(this, ChatDetailActivity.class);
-			detailIntent.putExtra("room", room.publicKey());
+			detailIntent.putExtra(ChatDetailFragment.CONTACT_PUK, room.publicKey());
 			startActivity(detailIntent);
 		}
 	}
-	
-	
+
+
 	private Chat chatApp() {
 		return ((ChatApp)getApplication()).model();
 	}
