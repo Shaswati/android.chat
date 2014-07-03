@@ -1,10 +1,10 @@
 package sneer.chat.impl;
-import static sneerteam.snapi.CloudPath.*;
+import static sneer.snapi.CloudPath.*;
 import rx.*;
 import rx.functions.*;
 import rx.subjects.*;
 import sneer.chat.*;
-import sneerteam.snapi.*;
+import sneer.snapi.*;
 import android.content.*;
 
 public class ChatImpl implements Chat {

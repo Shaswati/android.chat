@@ -1,7 +1,7 @@
 package sneer.chat;
 
 import rx.*;
-import sneerteam.snapi.*;
+import sneer.snapi.*;
 
 public interface Room extends Comparable<Room> {
 

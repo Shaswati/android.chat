@@ -5,7 +5,7 @@ import rx.functions.*;
 import sneer.android.chat.*;
 import sneer.android.chat.R;
 import sneer.chat.*;
-import sneerteam.snapi.*;
+import sneer.snapi.*;
 import android.content.*;
 import android.os.*;
 import android.support.v4.app.*;

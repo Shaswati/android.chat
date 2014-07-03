@@ -3,7 +3,7 @@ package sneer.chat.simulator;
 import rx.*;
 import rx.subjects.*;
 import sneer.chat.*;
-import sneerteam.snapi.*;
+import sneer.snapi.*;
 
 public class RoomSimulator implements Room {
 

@@ -5,7 +5,7 @@ import java.util.*;
 import rx.Observable;
 import rx.subjects.*;
 import sneer.chat.*;
-import sneerteam.snapi.*;
+import sneer.snapi.*;
 
 public class ChatSimulator implements Chat {
 
