@@ -15,7 +15,6 @@ import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
-
 /**
  * A fragment representing a single Chat detail screen. This fragment is either
  * contained in a {@link ChatListActivity} in two-pane mode (on tablets) or a
@@ -29,7 +28,8 @@ public class ChatDetailFragment extends Fragment {
 	 */
 	private ChatAdapter chatAdapter;
 	private List<Message> messages = createInitialMessages();
-	private ReplaySubject<Pair<Long, String>> sendSubject = ReplaySubject.create();
+	private ReplaySubject<Pair<Long, String>> sendSubject = ReplaySubject
+			.create();
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -47,54 +47,72 @@ public class ChatDetailFragment extends Fragment {
 		}
 	}
 
-	
 	private static List<Message> createInitialMessages() {
 		List<Message> messages = new ArrayList<Message>();
 		return messages;
 	}
-	
+
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_chat_detail, container, false);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View rootView = inflater.inflate(R.layout.fragment_chat_detail,
+				container, false);
 
 		Chat chat = ((ChatApp) getActivity().getApplication()).model();
 		final Room room = chat.findRoom(getArguments().getString(CONTACT_PUK));
 
-		getActivity().setTitle(room.contact().nickname());
-			
-		sendSubject.subscribe(new Action1<Pair<Long, String>>() {@Override public void call(Pair<Long, String> msg) {
-			room.sendMessage(msg.first, msg.second);
-		}});
-			
+		if (room.isGroup())
+			getActivity().setTitle("Chat Group");
+		else
+			getActivity().setTitle(room.contact().nickname());
+
+		sendSubject.subscribe(new Action1<Pair<Long, String>>() {
+			@Override
+			public void call(Pair<Long, String> msg) {
+				room.sendMessage(msg.first, msg.second);
+			}
+		});
+
 		room.messages().observeOn(AndroidSchedulers.mainThread())
-		.subscribe(new Action1<Message>() {@Override public void call(Message msg) {
-			onMessage(msg);
-		}});
-		
-		chatAdapter = new ChatAdapter(this.getActivity(), inflater, R.layout.list_item_user_message, R.layout.list_item_contact_message, messages);
+				.subscribe(new Action1<Message>() {
+					@Override
+					public void call(Message msg) {
+						onMessage(msg);
+					}
+				});
+
+		chatAdapter = new ChatAdapter(this.getActivity(), inflater,
+				R.layout.list_item_user_message,
+				R.layout.list_item_contact_message, messages);
 
 		ListView listView = (ListView) rootView.findViewById(R.id.listView);
 		listView.setAdapter(chatAdapter);
-		
-		final TextView widget = (TextView)rootView.findViewById(R.id.editText);
-		
-//		widget.setOnEditorActionListener(new OnEditorActionListener() {@Override public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//			if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-//				sendText(widget);
-//			}
-//			return false;
-//		}});
-		
-		Button b =  (Button) rootView.findViewById(R.id.sendButton);
-		b.setOnClickListener(new OnClickListener() {@Override public void onClick(View v) {
-			sendText(widget);
-		}});
+
+		final TextView widget = (TextView) rootView.findViewById(R.id.editText);
+
+		// widget.setOnEditorActionListener(new OnEditorActionListener()
+		// {@Override public boolean onEditorAction(TextView v, int actionId,
+		// KeyEvent event) {
+		// if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+		// sendText(widget);
+		// }
+		// return false;
+		// }});
+
+		Button b = (Button) rootView.findViewById(R.id.sendButton);
+		b.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				sendText(widget);
+			}
+		});
 
 		return rootView;
 	}
-	
+
 	private void sendText(final TextView widget) {
-		sendSubject.onNext(Pair.create(System.currentTimeMillis(), widget.getText().toString()));
+		sendSubject.onNext(Pair.create(System.currentTimeMillis(), widget
+				.getText().toString()));
 		widget.setText("");
 	}
 

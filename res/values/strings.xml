@@ -9,5 +9,6 @@
     <string name="action_contacts">Contacts</string>
     <string name="title_chat_list">SneerChat</string>
     <string name="title_chat_detail">Chat Detail</string>
+    <string name="action_group">Chat Group</string>
 
 </resources>

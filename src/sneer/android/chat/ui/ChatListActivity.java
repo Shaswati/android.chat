@@ -28,59 +28,73 @@ import android.widget.*;
  * This activity also implements the required {@link ChatListFragment.Callbacks}
  * interface to listen for item selections.
  */
-public class ChatListActivity extends FragmentActivity implements ChatListFragment.Callbacks {
-	
+public class ChatListActivity extends FragmentActivity implements
+		ChatListFragment.Callbacks {
+
 	private static ChatListFragment chatListFragment;
 
-	/** Whether or not the activity is in two-pane mode, i.e. running on a tablet device. */
+	/**
+	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
+	 * device.
+	 */
 	private boolean mTwoPane;
 
-
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.chat, menu);
 		return true;
 	}
 
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.action_contacts)
-			chatApp().pickContact().subscribe(new Action1<Contact>() {@Override public void call(Contact contact) {
-				onItemSelected(chatApp().produceRoomWith(contact));
-            }});
+			chatApp().pickContact().subscribe(new Action1<Contact>() {
+				@Override
+				public void call(Contact contact) {
+					onItemSelected(chatApp().produceRoomWith(contact));
+				}
+			});
+
+		if (item.getItemId() == R.id.action_group)
+			chatApp().pickGroup().subscribe(new Action1<ChatGroup>() {
+				@Override
+				public void call(ChatGroup group) {
+					onItemSelected(chatApp().produceRoomWith(group));
+				}
+			});
+
 		return true;
 	}
-	
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chat_list);
-		
-        SneerUtils.showSneerInstallationMessageIfNecessary(this);
-		
+
+		SneerUtils.showSneerInstallationMessageIfNecessary(this);
+
 		Chat app = chatApp();
-		app.rooms().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Room>() {@Override public void call(Room room) {
-			chatListFragment.addRom(room);
-		}});
-		
-		chatListFragment = (ChatListFragment) getSupportFragmentManager().findFragmentById(
-				R.id.chat_list);
+		app.rooms().observeOn(AndroidSchedulers.mainThread())
+				.subscribe(new Action1<Room>() {
+					@Override
+					public void call(Room room) {
+						chatListFragment.addRom(room);
+					}
+				});
+
+		chatListFragment = (ChatListFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.chat_list);
 
 		if (findViewById(R.id.chat_detail_container) != null) {
 			mTwoPane = true;
 			chatListFragment.setActivateOnItemClick(true);
 		}
 	}
-	
-	
+
 	protected void log(String string) {
 		Log.d(ChatListActivity.class.getSimpleName(), string);
 	}
 
-	
 	/**
 	 * Callback method from {@link ChatListFragment.Callbacks} indicating that
 	 * the item with the given ID was selected.
@@ -89,7 +103,8 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	public void onItemSelected(Room room) {
 		if (mTwoPane) {
 			Bundle arguments = new Bundle();
-			arguments.putString(ChatDetailFragment.CONTACT_PUK, room.publicKey());
+			arguments.putString(ChatDetailFragment.CONTACT_PUK,
+					room.publicKey());
 			ChatDetailFragment fragment = new ChatDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
@@ -97,17 +112,16 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 
 		} else {
 			Intent detailIntent = new Intent(this, ChatDetailActivity.class);
-			detailIntent.putExtra(ChatDetailFragment.CONTACT_PUK, room.publicKey());
+			detailIntent.putExtra(ChatDetailFragment.CONTACT_PUK,
+					room.publicKey());
 			startActivity(detailIntent);
 		}
 	}
 
-
 	private Chat chatApp() {
-		return ((ChatApp)getApplication()).model();
+		return ((ChatApp) getApplication()).model();
 	}
 
-	
 	void toast(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}

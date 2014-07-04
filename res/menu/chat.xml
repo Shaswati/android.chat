@@ -6,4 +6,10 @@
         android:showAsAction="ifRoom"
         android:title="@string/action_contacts"/>
 
+    <item
+        android:id="@+id/action_group"
+        android:orderInCategory="101"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_group"/>
+    
 </menu>

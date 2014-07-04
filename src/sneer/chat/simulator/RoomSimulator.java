@@ -8,11 +8,22 @@ import sneer.snapi.*;
 public class RoomSimulator implements Room {
 
 	private Contact contact;
+	private ChatGroup group;
 	private final ReplaySubject<Message> messages = ReplaySubject.create();
+	private boolean isGroup;
 
 	public RoomSimulator(Contact contact) {
 		this.contact = contact;
-		messages.onNext(new Message(System.currentTimeMillis(), contact.nickname(), "hello there!"));
+		messages.onNext(new Message(System.currentTimeMillis(), this.contact
+				.nickname(), "hello there!"));
+	}
+
+	public RoomSimulator(ChatGroup group) {
+		this.group = group;
+		this.contact = group.contacts.get(1);
+		this.isGroup = true;
+		messages.onNext(new Message(System.currentTimeMillis(), this.contact
+				.nickname(), "hello folks!"));
 	}
 
 	@Override
@@ -26,6 +37,10 @@ public class RoomSimulator implements Room {
 		return contact;
 	}
 
+	public ChatGroup group(){
+		return group;
+	}
+	
 	@Override
 	public String publicKey() {
 		return contact.publicKey();
@@ -33,7 +48,7 @@ public class RoomSimulator implements Room {
 
 	@Override
 	public Observable<Message> messages() {
-		return messages ;
+		return messages;
 	}
 
 	@Override
@@ -46,10 +61,16 @@ public class RoomSimulator implements Room {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
+
 	@Override
 	public String toString() {
 		return contact.nickname();
+	}
+
+	@Override
+	public boolean isGroup() {
+		
+		return isGroup;
 	}
 
 }

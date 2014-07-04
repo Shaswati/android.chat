@@ -64,4 +64,16 @@ public class ChatImpl implements Chat {
 		return ContactPicker.pickContact(context);
 	}
 
+	@Override
+	public Room produceRoomWith(ChatGroup group) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Observable<ChatGroup> pickGroup() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

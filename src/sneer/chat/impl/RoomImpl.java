@@ -94,5 +94,11 @@ public class RoomImpl implements Room {
 	public String publicKey() {
 		return contact.publicKey();
 	}
+
+	@Override
+	public boolean isGroup() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 }
