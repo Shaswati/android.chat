@@ -1,20 +1,23 @@
 package sneer.android.chat.ui;
 
-import rx.android.schedulers.*;
-import rx.functions.*;
-import sneer.android.chat.*;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import sneer.android.chat.ChatApp;
 import sneer.android.chat.R;
-import sneer.chat.*;
-import sneer.snapi.*;
-import android.content.*;
-import android.os.*;
-import android.support.v4.app.*;
-import android.util.*;
-import android.view.*;
-import android.widget.*;
+import sneer.chat.Chat;
+import sneer.chat.Room;
+import sneer.snapi.Contact;
+import sneer.snapi.SneerUtils;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 /**
- * An activity representing a list of Chats. This activity has different
+ * This activity has different
  * presentations for handset and tablet-size devices. On handsets, the activity
  * presents a list of items, which when touched, lead to a
  * {@link ChatDetailActivity} representing item details. On tablets, the
@@ -25,47 +28,36 @@ import android.widget.*;
  * {@link ChatListFragment} and the item details (if present) is a
  * {@link ChatDetailFragment}.
  * <p>
- * This activity also implements the required {@link ChatListFragment.Callbacks}
- * interface to listen for item selections.
  */
-public class ChatListActivity extends FragmentActivity implements
-		ChatListFragment.Callbacks {
+public class ChatListActivity extends FragmentActivity implements ChatListFragment.Callbacks {
 
 	private static ChatListFragment chatListFragment;
 
-	/**
-	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-	 * device.
-	 */
+	/** Whether or not the activity is in two-pane mode, i.e. running on a tablet device. */
 	private boolean mTwoPane;
 
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.chat, menu);
 		return true;
 	}
 
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.action_contacts)
-			chatApp().pickContact().subscribe(new Action1<Contact>() {
+			chat().pickContact().subscribe(new Action1<Contact>() {
 				@Override
 				public void call(Contact contact) {
-					onItemSelected(chatApp().produceRoomWith(contact));
-				}
-			});
-
-		if (item.getItemId() == R.id.action_group)
-			chatApp().pickGroup().subscribe(new Action1<ChatGroup>() {
-				@Override
-				public void call(ChatGroup group) {
-					onItemSelected(chatApp().produceRoomWith(group));
+					onItemSelected(chat().produceRoomWith(contact));
 				}
 			});
 
 		return true;
 	}
 
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -73,8 +65,7 @@ public class ChatListActivity extends FragmentActivity implements
 
 		SneerUtils.showSneerInstallationMessageIfNecessary(this);
 
-		Chat app = chatApp();
-		app.rooms().observeOn(AndroidSchedulers.mainThread())
+		chat().rooms().observeOn(AndroidSchedulers.mainThread())
 				.subscribe(new Action1<Room>() {
 					@Override
 					public void call(Room room) {
@@ -91,14 +82,13 @@ public class ChatListActivity extends FragmentActivity implements
 		}
 	}
 
+	
 	protected void log(String string) {
 		Log.d(ChatListActivity.class.getSimpleName(), string);
 	}
 
-	/**
-	 * Callback method from {@link ChatListFragment.Callbacks} indicating that
-	 * the item with the given ID was selected.
-	 */
+	
+	/** Callback method from {@link ChatListFragment.Callbacks} indicating that the item with the given ID was selected. */
 	@Override
 	public void onItemSelected(Room room) {
 		if (mTwoPane) {
@@ -118,10 +108,12 @@ public class ChatListActivity extends FragmentActivity implements
 		}
 	}
 
-	private Chat chatApp() {
+	
+	private Chat chat() {
 		return ((ChatApp) getApplication()).model();
 	}
 
+	
 	void toast(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
