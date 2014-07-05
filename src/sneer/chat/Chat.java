@@ -1,17 +1,17 @@
 package sneer.chat;
 
-import rx.*;
-import sneer.snapi.*;
+import rx.Observable;
 
 public interface Chat {
 
-	Observable<Contact> pickContact();
-	Observable<ChatGroup> pickGroup();
-	
-	Observable<Room> rooms();
-	Room produceRoomWith(Contact contact);
-	Room produceRoomWith(ChatGroup group);
-	Room findRoom(String contactPuk);
-	
+	/** All Conversations you have had. */
+	Observable<Conversation> conversations();
+
+	/** All Individual contacts that you have and all Groups you are a member of. */
+	Observable<Party> parties();
+	Observable<Party> findParty(String publicKey);
+
+	/** @return a new or existing Conversation with party. */
+	Conversation produceConversationWith(Party party);
 
 }

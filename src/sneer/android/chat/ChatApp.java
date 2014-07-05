@@ -6,9 +6,9 @@ import android.app.*;
 
 public class ChatApp extends Application {
 	
-	private Chat model;
+	private ChatOld model;
 
-	public Chat model() {
+	public ChatOld model() {
 		if (model == null)
 			model = new ChatSimulator();
 //			model = new ChatImpl(this);

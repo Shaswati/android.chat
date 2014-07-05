@@ -58,7 +58,7 @@ public class ChatDetailFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.fragment_chat_detail,
 				container, false);
 
-		Chat chat = ((ChatApp) getActivity().getApplication()).model();
+		ChatOld chat = ((ChatApp) getActivity().getApplication()).model();
 		final Room room = chat.findRoom(getArguments().getString(CONTACT_PUK));
 
 		if (room.isGroup())

@@ -7,12 +7,12 @@ import java.util.Map;
 
 import rx.Observable;
 import rx.subjects.ReplaySubject;
-import sneer.chat.Chat;
+import sneer.chat.ChatOld;
 import sneer.chat.ChatGroup;
 import sneer.chat.Room;
 import sneer.snapi.Contact;
 
-public class ChatSimulator implements Chat {
+public class ChatSimulator implements ChatOld {
 
 	private final ReplaySubject<Room> rooms = ReplaySubject.create();
 	private final Map<String, RoomSimulator> roomsByPuk = new HashMap<String, RoomSimulator>();

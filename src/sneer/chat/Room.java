@@ -5,9 +5,8 @@ import sneer.snapi.*;
 
 public interface Room extends Comparable<Room> {
 
+	String contactPublicKey();
 	Contact contact();
-	/** @return contact().publicKey() */
-	String publicKey();
 	boolean isGroup();
 	
 	Observable<Message> messages();

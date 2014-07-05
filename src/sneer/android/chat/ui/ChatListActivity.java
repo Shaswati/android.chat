@@ -4,7 +4,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import sneer.android.chat.ChatApp;
 import sneer.android.chat.R;
-import sneer.chat.Chat;
+import sneer.chat.ChatOld;
 import sneer.chat.Room;
 import sneer.snapi.Contact;
 import sneer.snapi.SneerUtils;
@@ -94,7 +94,7 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 		if (mTwoPane) {
 			Bundle arguments = new Bundle();
 			arguments.putString(ChatDetailFragment.CONTACT_PUK,
-					room.publicKey());
+					room.contactPublicKey());
 			ChatDetailFragment fragment = new ChatDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
@@ -103,13 +103,13 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 		} else {
 			Intent detailIntent = new Intent(this, ChatDetailActivity.class);
 			detailIntent.putExtra(ChatDetailFragment.CONTACT_PUK,
-					room.publicKey());
+					room.contactPublicKey());
 			startActivity(detailIntent);
 		}
 	}
 
 	
-	private Chat chat() {
+	private ChatOld chat() {
 		return ((ChatApp) getApplication()).model();
 	}
 

@@ -7,7 +7,7 @@ import sneer.chat.*;
 import sneer.snapi.*;
 import android.content.*;
 
-public class ChatImpl implements Chat {
+public class ChatImpl implements ChatOld {
 	
 	private final Context context;
 	private final ReplaySubject<Room> rooms = ReplaySubject.create();

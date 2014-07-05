@@ -42,7 +42,7 @@ public class RoomSimulator implements Room {
 	}
 	
 	@Override
-	public String publicKey() {
+	public String contactPublicKey() {
 		return contact.publicKey();
 	}
 
