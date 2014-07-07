@@ -1,11 +1,9 @@
 package sneer.chat;
 
-import android.annotation.SuppressLint;
-
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
 
-import rx.functions.*;
+import android.annotation.SuppressLint;
 
 public class OldMessage implements Comparable<OldMessage> {
 	
@@ -95,19 +93,6 @@ public class OldMessage implements Comparable<OldMessage> {
 		if (timestamp != other.timestamp)
 			return false;
 		return true;
-	}
-
-	@SuppressWarnings("rawtypes")
-	public static Func1<? super Map, ? extends OldMessage> mapToMessage() {
-		return new Func1<Map, OldMessage>() {
-			@Override
-			public OldMessage call(Map value) {
-				long timestamp = (Long) value.get("timestamp");
-				String sender = (String) value.get("sender");
-				String contents = (String) value.get("contents");
-				return new OldMessage(timestamp, sender, contents);
-			}
-		};
 	}
 
 	@Override
