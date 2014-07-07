@@ -1,4 +1,4 @@
-package sneer.chat.impl;
+package sneer.chat.impl_old;
 
 import static sneer.snapi.CloudPath.*;
 import rx.*;
@@ -8,10 +8,10 @@ import sneer.chat.*;
 import sneer.chat.util.*;
 import sneer.snapi.*;
 
-public class RoomImpl implements Room {
+public class RoomImpl implements OldRoom {
 	
 	private Contact contact;
-	private Subject<Message, Message> messages = ReplaySubject.create();
+	private Subject<OldMessage, OldMessage> messages = ReplaySubject.create();
 	private Cloud cloud;
 	private long lastMessageTimestamp = System.currentTimeMillis();
 	
@@ -20,13 +20,13 @@ public class RoomImpl implements Room {
 		this.contact = contact;
 		listenOn(cloud.path(ME, "chat", "one-on-one", contact.publicKey()), "me").subscribe(messages);
 		listenOn(cloud.path(contact.publicKey(), "chat", "one-on-one", ME), contact.nickname()).subscribe(messages);
-		messages.subscribe(new Action1<Message>() {@Override public void call(Message msg) {
+		messages.subscribe(new Action1<OldMessage>() {@Override public void call(OldMessage msg) {
 			lastMessageTimestamp = Math.max(msg.timestamp(), lastMessageTimestamp);
 		}});
 	}
 
     @Override
-	public int compareTo(Room another) {
+	public int compareTo(OldRoom another) {
 		return Comparators.compare(another.lastMessageTimestamp(), lastMessageTimestamp());
 	}
 
@@ -66,16 +66,16 @@ public class RoomImpl implements Room {
 	}
 
 	@Override
-	public Observable<Message> messages() {
+	public Observable<OldMessage> messages() {
 		return messages;
 	}
 
-	private Observable<Message> listenOn(CloudPath path, final String sender) {
+	private Observable<OldMessage> listenOn(CloudPath path, final String sender) {
 		return path.children()
-			.flatMap(new Func1<PathEvent, Observable<? extends Message>>() {@Override public Observable<? extends Message> call(final PathEvent path) {
+			.flatMap(new Func1<PathEvent, Observable<? extends OldMessage>>() {@Override public Observable<? extends OldMessage> call(final PathEvent path) {
 				return path.path().value()
-				.map(new Func1<Object, Message>() {@Override public Message call(Object message) {
-					return new Message((Long) path.path().lastSegment(), sender, (String)message);
+				.map(new Func1<Object, OldMessage>() {@Override public OldMessage call(Object message) {
+					return new OldMessage((Long) path.path().lastSegment(), sender, (String)message);
 				}});
 			}});
 	}

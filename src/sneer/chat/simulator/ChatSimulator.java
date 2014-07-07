@@ -7,23 +7,23 @@ import java.util.Map;
 
 import rx.Observable;
 import rx.subjects.ReplaySubject;
-import sneer.chat.ChatOld;
-import sneer.chat.ChatGroup;
-import sneer.chat.Room;
+import sneer.chat.OldChat;
+import sneer.chat.OldGroup;
+import sneer.chat.OldRoom;
 import sneer.snapi.Contact;
 
-public class ChatSimulator implements ChatOld {
+public class ChatSimulator implements OldChat {
 
-	private final ReplaySubject<Room> rooms = ReplaySubject.create();
+	private final ReplaySubject<OldRoom> rooms = ReplaySubject.create();
 	private final Map<String, RoomSimulator> roomsByPuk = new HashMap<String, RoomSimulator>();
 
 	@Override
-	public Observable<Room> rooms() {
+	public Observable<OldRoom> rooms() {
 		return rooms;
 	}
 
 	@Override
-	public Room produceRoomWith(Contact contact) {
+	public OldRoom produceRoomWith(Contact contact) {
 		RoomSimulator ret = roomsByPuk.get(contact.publicKey());
 		if (ret == null) {
 			ret = new RoomSimulator(contact);
@@ -34,7 +34,7 @@ public class ChatSimulator implements ChatOld {
 	}
 
 	@Override
-	public Room produceRoomWith(ChatGroup group) {
+	public OldRoom produceRoomWith(OldGroup group) {
 		
 		RoomSimulator ret = roomsByPuk.get(group.contacts.get(1).publicKey());
 		if (ret == null) {
@@ -46,7 +46,7 @@ public class ChatSimulator implements ChatOld {
 	}
 	
 	@Override
-	public Room findRoom(String contactPuk) {
+	public OldRoom findRoom(String contactPuk) {
 		RoomSimulator ret = roomsByPuk.get(contactPuk);
 		if (ret == null) 
 			throw new IllegalArgumentException("No room found with publicKey " + contactPuk);
@@ -59,7 +59,7 @@ public class ChatSimulator implements ChatOld {
 		return Observable.from(new Contact("fdsfs098", "Neide"));
 	}
 
-	public Observable<ChatGroup> pickGroup(){
+	public Observable<OldGroup> pickGroup(){
 		List<Contact> contacts = new ArrayList<Contact>();
 		contacts.add(new Contact("fdsfs098", "Neide"));
 		contacts.add(new Contact("fdsfs097", "Pedro"));
@@ -67,7 +67,7 @@ public class ChatSimulator implements ChatOld {
 		contacts.add(new Contact("fdsfs095", "Batman"));
 		contacts.add(new Contact("fdsfs094", "Lanterna Verde"));
 		
-		return Observable.from(new ChatGroup(contacts));
+		return Observable.from(new OldGroup(contacts));
 
 		
 	}

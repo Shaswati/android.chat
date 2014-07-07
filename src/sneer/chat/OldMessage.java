@@ -7,7 +7,7 @@ import java.util.*;
 
 import rx.functions.*;
 
-public class Message implements Comparable<Message> {
+public class OldMessage implements Comparable<OldMessage> {
 	
 	private final String content;
 	private final String sender;
@@ -15,14 +15,14 @@ public class Message implements Comparable<Message> {
 	private final long timestamp;
 	private final boolean isOwn;
 	
-	public Message(long timestamp, String content) {
+	public OldMessage(long timestamp, String content) {
 		this.timestamp = timestamp;
 		this.sender = null;
 		this.content = content;
 		this.isOwn = true;
 	}
 	
-	public Message(long timestamp, String sender, String content) {
+	public OldMessage(long timestamp, String sender, String content) {
 		this.timestamp = timestamp;
 		this.sender = sender;
 		this.content = content;
@@ -52,7 +52,7 @@ public class Message implements Comparable<Message> {
 	}
 
 	@Override
-	public int compareTo(Message another) {
+	public int compareTo(OldMessage another) {
 		if (timestamp < another.timestamp)
 			return -1;
 		if (timestamp > another.timestamp)
@@ -81,7 +81,7 @@ public class Message implements Comparable<Message> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Message other = (Message) obj;
+		OldMessage other = (OldMessage) obj;
 		if (content == null) {
 			if (other.content != null)
 				return false;
@@ -98,14 +98,14 @@ public class Message implements Comparable<Message> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static Func1<? super Map, ? extends Message> mapToMessage() {
-		return new Func1<Map, Message>() {
+	public static Func1<? super Map, ? extends OldMessage> mapToMessage() {
+		return new Func1<Map, OldMessage>() {
 			@Override
-			public Message call(Map value) {
+			public OldMessage call(Map value) {
 				long timestamp = (Long) value.get("timestamp");
 				String sender = (String) value.get("sender");
 				String contents = (String) value.get("contents");
-				return new Message(timestamp, sender, contents);
+				return new OldMessage(timestamp, sender, contents);
 			}
 		};
 	}

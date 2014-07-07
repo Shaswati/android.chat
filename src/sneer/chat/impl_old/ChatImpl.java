@@ -1,4 +1,4 @@
-package sneer.chat.impl;
+package sneer.chat.impl_old;
 import static sneer.snapi.CloudPath.*;
 import rx.*;
 import rx.functions.*;
@@ -7,10 +7,10 @@ import sneer.chat.*;
 import sneer.snapi.*;
 import android.content.*;
 
-public class ChatImpl implements ChatOld {
+public class ChatImpl implements OldChat {
 	
 	private final Context context;
-	private final ReplaySubject<Room> rooms = ReplaySubject.create();
+	private final ReplaySubject<OldRoom> rooms = ReplaySubject.create();
 	private final PublishSubject<String> oneOnOnePublicKeys = PublishSubject.create();
 
 	public ChatImpl(Context context) {
@@ -37,12 +37,12 @@ public class ChatImpl implements ChatOld {
 	}
 
 	@Override
-	public Observable<Room> rooms() {
+	public Observable<OldRoom> rooms() {
 		return rooms;
 	}
 
 	@Override
-	public Room produceRoomWith(final Contact contact) {
+	public OldRoom produceRoomWith(final Contact contact) {
 //		oneOnOnePublicKeys.onNext(publicKey);
 //		return rooms.filter(new Func1<Room, Boolean>() {@Override public Boolean call(Room room) {
 //			return publicKey.equals(room.publicKey());
@@ -54,7 +54,7 @@ public class ChatImpl implements ChatOld {
 	}
 
 	@Override
-	public Room findRoom(String contactPuk) {
+	public OldRoom findRoom(String contactPuk) {
 		// Throws an exception if the Room is not found
 		return null;
 	}
@@ -65,13 +65,13 @@ public class ChatImpl implements ChatOld {
 	}
 
 	@Override
-	public Room produceRoomWith(ChatGroup group) {
+	public OldRoom produceRoomWith(OldGroup group) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Observable<ChatGroup> pickGroup() {
+	public Observable<OldGroup> pickGroup() {
 		// TODO Auto-generated method stub
 		return null;
 	}

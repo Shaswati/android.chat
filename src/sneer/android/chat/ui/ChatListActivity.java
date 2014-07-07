@@ -4,8 +4,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import sneer.android.chat.ChatApp;
 import sneer.android.chat.R;
-import sneer.chat.ChatOld;
-import sneer.chat.Room;
+import sneer.chat.OldChat;
+import sneer.chat.OldRoom;
 import sneer.snapi.Contact;
 import sneer.snapi.SneerUtils;
 import android.content.Intent;
@@ -66,9 +66,9 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 		SneerUtils.showSneerInstallationMessageIfNecessary(this);
 
 		chat().rooms().observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Action1<Room>() {
+				.subscribe(new Action1<OldRoom>() {
 					@Override
-					public void call(Room room) {
+					public void call(OldRoom room) {
 						chatListFragment.addRom(room);
 					}
 				});
@@ -90,7 +90,7 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	
 	/** Callback method from {@link ChatListFragment.Callbacks} indicating that the item with the given ID was selected. */
 	@Override
-	public void onItemSelected(Room room) {
+	public void onItemSelected(OldRoom room) {
 		if (mTwoPane) {
 			Bundle arguments = new Bundle();
 			arguments.putString(ChatDetailFragment.CONTACT_PUK,
@@ -109,7 +109,7 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	}
 
 	
-	private ChatOld chat() {
+	private OldChat chat() {
 		return ((ChatApp) getApplication()).model();
 	}
 

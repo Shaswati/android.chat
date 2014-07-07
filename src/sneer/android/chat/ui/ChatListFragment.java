@@ -5,7 +5,7 @@ import java.util.*;
 import rx.android.schedulers.*;
 import rx.functions.*;
 import sneer.chat.*;
-import sneer.chat.Message;
+import sneer.chat.OldMessage;
 import android.app.*;
 import android.os.*;
 import android.support.v4.app.ListFragment;
@@ -41,8 +41,8 @@ public class ChatListFragment extends ListFragment {
 	 */
 	private int mActivatedPosition = ListView.INVALID_POSITION;
 	
-	private List<Room> rooms = new ArrayList<Room>();
-	private ArrayAdapter<Room> contactsAdapter;
+	private List<OldRoom> rooms = new ArrayList<OldRoom>();
+	private ArrayAdapter<OldRoom> contactsAdapter;
 
 	/**
 	 * A callback interface that all activities containing this fragment must
@@ -53,7 +53,7 @@ public class ChatListFragment extends ListFragment {
 		/**
 		 * Callback for when an item has been selected.
 		 */
-		public void onItemSelected(Room contact);
+		public void onItemSelected(OldRoom contact);
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class ChatListFragment extends ListFragment {
 	 */
 	private static Callbacks sDummyCallbacks = new Callbacks() {
 		@Override
-		public void onItemSelected(Room contact) {
+		public void onItemSelected(OldRoom contact) {
 		}
 	};
 
@@ -77,7 +77,7 @@ public class ChatListFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		contactsAdapter = new ArrayAdapter<Room>(getActivity(),
+		contactsAdapter = new ArrayAdapter<OldRoom>(getActivity(),
 				android.R.layout.simple_list_item_activated_1,
 				android.R.id.text1, rooms);
 		setListAdapter(contactsAdapter);
@@ -151,10 +151,10 @@ public class ChatListFragment extends ListFragment {
 						: ListView.CHOICE_MODE_NONE);
 	}
 
-	public void addRom(Room Room) {
+	public void addRom(OldRoom Room) {
 		if (!rooms.contains(Room)) {
 			rooms.add(Room);
-			Room.messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Message>() {@Override public void call(Message msg) {
+			Room.messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<OldMessage>() {@Override public void call(OldMessage msg) {
 				Collections.sort(rooms);
 				contactsAdapter.notifyDataSetChanged();
 			}});

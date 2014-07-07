@@ -7,7 +7,7 @@ import rx.functions.*;
 import rx.subjects.*;
 import sneer.android.chat.*;
 import sneer.chat.*;
-import sneer.chat.Message;
+import sneer.chat.OldMessage;
 import android.os.*;
 import android.support.v4.app.*;
 import android.util.*;
@@ -27,7 +27,7 @@ public class ChatDetailFragment extends Fragment {
 	 * represents.
 	 */
 	private ChatAdapter chatAdapter;
-	private List<Message> messages = createInitialMessages();
+	private List<OldMessage> messages = createInitialMessages();
 	private ReplaySubject<Pair<Long, String>> sendSubject = ReplaySubject
 			.create();
 
@@ -38,7 +38,7 @@ public class ChatDetailFragment extends Fragment {
 	public ChatDetailFragment() {
 	}
 
-	protected void onMessage(Message msg) {
+	protected void onMessage(OldMessage msg) {
 		int insertionPointHint = Collections.binarySearch(messages, msg);
 		if (insertionPointHint < 0) {
 			int insertionPoint = Math.abs(insertionPointHint) - 1;
@@ -47,8 +47,8 @@ public class ChatDetailFragment extends Fragment {
 		}
 	}
 
-	private static List<Message> createInitialMessages() {
-		List<Message> messages = new ArrayList<Message>();
+	private static List<OldMessage> createInitialMessages() {
+		List<OldMessage> messages = new ArrayList<OldMessage>();
 		return messages;
 	}
 
@@ -58,8 +58,8 @@ public class ChatDetailFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.fragment_chat_detail,
 				container, false);
 
-		ChatOld chat = ((ChatApp) getActivity().getApplication()).model();
-		final Room room = chat.findRoom(getArguments().getString(CONTACT_PUK));
+		OldChat chat = ((ChatApp) getActivity().getApplication()).model();
+		final OldRoom room = chat.findRoom(getArguments().getString(CONTACT_PUK));
 
 		if (room.isGroup())
 			getActivity().setTitle("Chat Group");
@@ -74,9 +74,9 @@ public class ChatDetailFragment extends Fragment {
 		});
 
 		room.messages().observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Action1<Message>() {
+				.subscribe(new Action1<OldMessage>() {
 					@Override
-					public void call(Message msg) {
+					public void call(OldMessage msg) {
 						onMessage(msg);
 					}
 				});

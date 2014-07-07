@@ -6,7 +6,7 @@ public interface Conversation extends Comparable<Conversation> {
 
 	Party party();
 	
-	Observable<Message> messages();
+	Observable<OldMessage> messages();
 	void sendMessage(long timestamp, String message);
 	
 }

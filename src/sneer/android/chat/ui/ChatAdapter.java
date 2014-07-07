@@ -11,14 +11,14 @@ import android.graphics.drawable.*;
 import android.view.*;
 import android.widget.*;
 
-public class ChatAdapter extends ArrayAdapter<Message>{
+public class ChatAdapter extends ArrayAdapter<OldMessage>{
 
     int layoutUserResourceId;    
     int listContactResourceId;
-    List<Message> data = null;
+    List<OldMessage> data = null;
 	private LayoutInflater inflater;
     
-    public ChatAdapter(Context context, LayoutInflater inflater, int layoutUserResourceId, int listContactResourceId, List<Message> data) {
+    public ChatAdapter(Context context, LayoutInflater inflater, int layoutUserResourceId, int listContactResourceId, List<OldMessage> data) {
         super(context, layoutUserResourceId, data);
 		this.inflater = inflater;
         this.layoutUserResourceId = layoutUserResourceId;
@@ -31,7 +31,7 @@ public class ChatAdapter extends ArrayAdapter<Message>{
     public View getView(int position, View convertView, ViewGroup parent) {
         View row;
         
-        Message message = data.get(position);
+        OldMessage message = data.get(position);
         
         int resourceId = message.isOwn() ? layoutUserResourceId : listContactResourceId;
         row = inflater.inflate(resourceId, parent, false);

@@ -4,13 +4,13 @@ import java.util.List;
 
 import sneer.snapi.Contact;
 
-public class ChatGroup {
+public class OldGroup {
 
 	public String name;
 	
 	public List<Contact> contacts;
 	
-	public ChatGroup(List<Contact> contacts){
+	public OldGroup(List<Contact> contacts){
 		this.contacts = contacts;
 	}
 	

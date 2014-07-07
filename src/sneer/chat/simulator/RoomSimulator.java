@@ -5,29 +5,29 @@ import rx.subjects.*;
 import sneer.chat.*;
 import sneer.snapi.*;
 
-public class RoomSimulator implements Room {
+public class RoomSimulator implements OldRoom {
 
 	private Contact contact;
-	private ChatGroup group;
-	private final ReplaySubject<Message> messages = ReplaySubject.create();
+	private OldGroup group;
+	private final ReplaySubject<OldMessage> messages = ReplaySubject.create();
 	private boolean isGroup;
 
 	public RoomSimulator(Contact contact) {
 		this.contact = contact;
-		messages.onNext(new Message(System.currentTimeMillis(), this.contact
+		messages.onNext(new OldMessage(System.currentTimeMillis(), this.contact
 				.nickname(), "hello there!"));
 	}
 
-	public RoomSimulator(ChatGroup group) {
+	public RoomSimulator(OldGroup group) {
 		this.group = group;
 		this.contact = group.contacts.get(1);
 		this.isGroup = true;
-		messages.onNext(new Message(System.currentTimeMillis(), this.contact
+		messages.onNext(new OldMessage(System.currentTimeMillis(), this.contact
 				.nickname(), "hello folks!"));
 	}
 
 	@Override
-	public int compareTo(Room another) {
+	public int compareTo(OldRoom another) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -37,7 +37,7 @@ public class RoomSimulator implements Room {
 		return contact;
 	}
 
-	public ChatGroup group(){
+	public OldGroup group(){
 		return group;
 	}
 	
@@ -47,13 +47,13 @@ public class RoomSimulator implements Room {
 	}
 
 	@Override
-	public Observable<Message> messages() {
+	public Observable<OldMessage> messages() {
 		return messages;
 	}
 
 	@Override
 	public void sendMessage(long timestamp, String message) {
-		messages.onNext(new Message(System.currentTimeMillis(), message));
+		messages.onNext(new OldMessage(System.currentTimeMillis(), message));
 	}
 
 	@Override
