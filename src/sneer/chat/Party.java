@@ -13,5 +13,5 @@ public interface Party {
 	/** The name this Party gives itself.
 	 * JUST AN EXAMPLE FOR THE FUTURE. NOT IMPLEMENTED OR USED IN THE CHAT APP. */
 	Observable<String> name();
-	
+		
 }

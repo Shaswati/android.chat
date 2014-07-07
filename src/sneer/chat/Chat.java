@@ -13,5 +13,7 @@ public interface Chat {
 
 	/** @return an existing Conversation with party or a new one if it doesn't exist. */
 	Conversation produceConversationWith(Party party);
+	Conversation findConversation(String publicKey);
+	Observable<Party> pickParty();
 
 }

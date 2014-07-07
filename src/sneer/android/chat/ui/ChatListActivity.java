@@ -1,20 +1,17 @@
 package sneer.android.chat.ui;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import sneer.android.chat.ChatApp;
+import rx.android.schedulers.*;
+import rx.functions.*;
+import sneer.android.chat.*;
 import sneer.android.chat.R;
-import sneer.chat.OldChat;
-import sneer.chat.OldRoom;
-import sneer.snapi.Contact;
-import sneer.snapi.SneerUtils;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Toast;
+import sneer.chat.*;
+import sneer.snapi.*;
+import android.content.*;
+import android.os.*;
+import android.support.v4.app.*;
+import android.util.*;
+import android.view.*;
+import android.widget.*;
 
 /**
  * This activity has different
@@ -47,7 +44,7 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.action_contacts)
-			chat().pickContact().subscribe(new Action1<Contact>() {
+			chat().pickParty().subscribe(new Action1<Contact>() {
 				@Override
 				public void call(Contact contact) {
 					onItemSelected(chat().produceRoomWith(contact));
@@ -93,7 +90,7 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	public void onItemSelected(OldRoom room) {
 		if (mTwoPane) {
 			Bundle arguments = new Bundle();
-			arguments.putString(ChatDetailFragment.CONTACT_PUK,
+			arguments.putString(ChatDetailFragment.PARTY_PUK,
 					room.contactPublicKey());
 			ChatDetailFragment fragment = new ChatDetailFragment();
 			fragment.setArguments(arguments);
@@ -102,14 +99,14 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 
 		} else {
 			Intent detailIntent = new Intent(this, ChatDetailActivity.class);
-			detailIntent.putExtra(ChatDetailFragment.CONTACT_PUK,
+			detailIntent.putExtra(ChatDetailFragment.PARTY_PUK,
 					room.contactPublicKey());
 			startActivity(detailIntent);
 		}
 	}
 
 	
-	private OldChat chat() {
+	private Chat chat() {
 		return ((ChatApp) getApplication()).model();
 	}
 

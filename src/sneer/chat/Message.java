@@ -1,5 +1,10 @@
 package sneer.chat;
 
+import java.text.*;
+import java.util.*;
+
+import android.annotation.*;
+
 
 public class Message {
 	
@@ -22,6 +27,11 @@ public class Message {
 		this.content = content;
 	}
 
+	@SuppressLint("SimpleDateFormat")
+	public String time() {
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+		return sdf.format(new Date(timestamp));
+	}
 	
 	public boolean isOwn() {
 		return sender == null;

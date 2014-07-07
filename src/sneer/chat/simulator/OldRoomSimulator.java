@@ -5,20 +5,20 @@ import rx.subjects.*;
 import sneer.chat.*;
 import sneer.snapi.*;
 
-public class RoomSimulator implements OldRoom {
+public class OldRoomSimulator implements OldRoom {
 
 	private Contact contact;
 	private OldGroup group;
 	private final ReplaySubject<OldMessage> messages = ReplaySubject.create();
 	private boolean isGroup;
 
-	public RoomSimulator(Contact contact) {
+	public OldRoomSimulator(Contact contact) {
 		this.contact = contact;
 		messages.onNext(new OldMessage(System.currentTimeMillis(), this.contact
 				.nickname(), "hello there!"));
 	}
 
-	public RoomSimulator(OldGroup group) {
+	public OldRoomSimulator(OldGroup group) {
 		this.group = group;
 		this.contact = group.contacts.get(1);
 		this.isGroup = true;

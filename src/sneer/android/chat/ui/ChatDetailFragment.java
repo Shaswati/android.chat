@@ -7,7 +7,8 @@ import rx.functions.*;
 import rx.subjects.*;
 import sneer.android.chat.*;
 import sneer.chat.*;
-import sneer.chat.OldMessage;
+import sneer.chat.Message;
+import sneer.chat.util.*;
 import android.os.*;
 import android.support.v4.app.*;
 import android.util.*;
@@ -20,16 +21,16 @@ import android.widget.*;
  * contained in a {@link ChatListActivity} in two-pane mode (on tablets) or a
  * {@link ChatDetailActivity} on handsets.
  */
-public class ChatDetailFragment extends Fragment {
-	static final String CONTACT_PUK = "contactPuk";
+public class ChatDetailFragment extends Fragment implements Comparator<Message> {
+	
+	static final String PARTY_PUK = "partyPuk";
 	/**
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
 	 */
 	private ChatAdapter chatAdapter;
-	private List<OldMessage> messages = createInitialMessages();
-	private ReplaySubject<Pair<Long, String>> sendSubject = ReplaySubject
-			.create();
+	private List<Message> messages = createInitialMessages();
+	private ReplaySubject<Pair<Long, String>> sendSubject = ReplaySubject.create();
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -38,7 +39,7 @@ public class ChatDetailFragment extends Fragment {
 	public ChatDetailFragment() {
 	}
 
-	protected void onMessage(OldMessage msg) {
+	protected void onMessage(Message msg) {
 		int insertionPointHint = Collections.binarySearch(messages, msg);
 		if (insertionPointHint < 0) {
 			int insertionPoint = Math.abs(insertionPointHint) - 1;
@@ -47,8 +48,13 @@ public class ChatDetailFragment extends Fragment {
 		}
 	}
 
-	private static List<OldMessage> createInitialMessages() {
-		List<OldMessage> messages = new ArrayList<OldMessage>();
+	@Override
+	public int compare(Message lhs, Message rhs) {
+		return Comparators.compare(lhs.timestamp(), rhs.timestamp());
+	}
+	
+	private static List<Message> createInitialMessages() {
+		List<Message> messages = new ArrayList<Message>();
 		return messages;
 	}
 
@@ -58,25 +64,22 @@ public class ChatDetailFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.fragment_chat_detail,
 				container, false);
 
-		OldChat chat = ((ChatApp) getActivity().getApplication()).model();
-		final OldRoom room = chat.findRoom(getArguments().getString(CONTACT_PUK));
+		Chat chat = ((ChatApp) getActivity().getApplication()).model();
+		final Conversation conversation = chat.findConversation(getArguments().getString(PARTY_PUK));
 
-		if (room.isGroup())
-			getActivity().setTitle("Chat Group");
-		else
-			getActivity().setTitle(room.contact().nickname());
+		getActivity().setTitle(conversation.party().nickname().toString());
 
 		sendSubject.subscribe(new Action1<Pair<Long, String>>() {
 			@Override
 			public void call(Pair<Long, String> msg) {
-				room.sendMessage(msg.first, msg.second);
+				conversation.sendMessage(msg.second);
 			}
 		});
 
-		room.messages().observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Action1<OldMessage>() {
+		conversation.messages().observeOn(AndroidSchedulers.mainThread())
+				.subscribe(new Action1<Message>() {
 					@Override
-					public void call(OldMessage msg) {
+					public void call(Message msg) {
 						onMessage(msg);
 					}
 				});
@@ -89,15 +92,6 @@ public class ChatDetailFragment extends Fragment {
 		listView.setAdapter(chatAdapter);
 
 		final TextView widget = (TextView) rootView.findViewById(R.id.editText);
-
-		// widget.setOnEditorActionListener(new OnEditorActionListener()
-		// {@Override public boolean onEditorAction(TextView v, int actionId,
-		// KeyEvent event) {
-		// if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-		// sendText(widget);
-		// }
-		// return false;
-		// }});
 
 		Button b = (Button) rootView.findViewById(R.id.sendButton);
 		b.setOnClickListener(new OnClickListener() {

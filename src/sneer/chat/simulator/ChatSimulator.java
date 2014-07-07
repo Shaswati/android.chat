@@ -1,75 +1,68 @@
 package sneer.chat.simulator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import rx.Observable;
-import rx.subjects.ReplaySubject;
-import sneer.chat.OldChat;
-import sneer.chat.OldGroup;
-import sneer.chat.OldRoom;
-import sneer.snapi.Contact;
+import rx.subjects.*;
+import sneer.chat.*;
 
-public class ChatSimulator implements OldChat {
-
-	private final ReplaySubject<OldRoom> rooms = ReplaySubject.create();
-	private final Map<String, RoomSimulator> roomsByPuk = new HashMap<String, RoomSimulator>();
+public class ChatSimulator implements Chat {
+	
+	private final ReplaySubject<Conversation> conversations = ReplaySubject.create();
+	private final Map<Observable<String>, ConversationSimulator> conversationsByPuk = new HashMap<Observable<String>, ConversationSimulator>();
 
 	@Override
-	public Observable<OldRoom> rooms() {
-		return rooms;
+	public Observable<Party> parties() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public OldRoom produceRoomWith(Contact contact) {
-		RoomSimulator ret = roomsByPuk.get(contact.publicKey());
-		if (ret == null) {
-			ret = new RoomSimulator(contact);
-			roomsByPuk.put(contact.publicKey(), ret);
-			rooms.onNext(ret);
-		}
-		return ret;
+	public Observable<Party> findParty(String publicKey) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public OldRoom produceRoomWith(OldGroup group) {
-		
-		RoomSimulator ret = roomsByPuk.get(group.contacts.get(1).publicKey());
-		if (ret == null) {
-			ret = new RoomSimulator(group);
-			roomsByPuk.put(group.contacts.get(1).publicKey(), ret);
-			rooms.onNext(ret);
-		}
-		return ret;
+	public Observable<Conversation> conversations() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Conversation produceConversationWith(Party party) {
+		if (party instanceof Individual)
+			return produceConversationWithIndividual(party);
+		else
+			return produceConversationWithGroup(party);
 	}
 	
+	private Conversation produceConversationWithIndividual(Party party) {
+		ConversationSimulator ret = conversationsByPuk.get(party.publicKey());
+		if (ret == null) {
+			ret = new ConversationSimulator(party);
+			conversationsByPuk.put(party.publicKey(), ret);
+			conversations.onNext(ret);
+		}
+		return ret;
+	}
+
+	private Conversation produceConversationWithGroup(Party party) {
+		return null;
+	}
+
 	@Override
-	public OldRoom findRoom(String contactPuk) {
-		RoomSimulator ret = roomsByPuk.get(contactPuk);
+	public Conversation findConversation(String publicKey) {
+		ConversationSimulator ret = conversationsByPuk.get(publicKey);
 		if (ret == null) 
-			throw new IllegalArgumentException("No room found with publicKey " + contactPuk);
+			throw new IllegalArgumentException("No conversation found with publicKey " + publicKey);
 		
 		return ret;
 	}
 
 	@Override
-	public Observable<Contact> pickContact() {
-		return Observable.from(new Contact("fdsfs098", "Neide"));
-	}
-
-	public Observable<OldGroup> pickGroup(){
-		List<Contact> contacts = new ArrayList<Contact>();
-		contacts.add(new Contact("fdsfs098", "Neide"));
-		contacts.add(new Contact("fdsfs097", "Pedro"));
-		contacts.add(new Contact("fdsfs096", "Alberto"));
-		contacts.add(new Contact("fdsfs095", "Batman"));
-		contacts.add(new Contact("fdsfs094", "Lanterna Verde"));
-		
-		return Observable.from(new OldGroup(contacts));
-
-		
+	public Observable<Party> pickParty() {
+		return Observable.from(new Party("fdsfs098", "Neide"));
 	}
 
 }

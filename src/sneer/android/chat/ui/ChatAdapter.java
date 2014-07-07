@@ -11,14 +11,14 @@ import android.graphics.drawable.*;
 import android.view.*;
 import android.widget.*;
 
-public class ChatAdapter extends ArrayAdapter<OldMessage>{
+public class ChatAdapter extends ArrayAdapter<Message>{
 
     int layoutUserResourceId;    
     int listContactResourceId;
-    List<OldMessage> data = null;
+    List<Message> data = null;
 	private LayoutInflater inflater;
     
-    public ChatAdapter(Context context, LayoutInflater inflater, int layoutUserResourceId, int listContactResourceId, List<OldMessage> data) {
+    public ChatAdapter(Context context, LayoutInflater inflater, int layoutUserResourceId, int listContactResourceId, List<Message> data) {
         super(context, layoutUserResourceId, data);
 		this.inflater = inflater;
         this.layoutUserResourceId = layoutUserResourceId;
@@ -31,8 +31,10 @@ public class ChatAdapter extends ArrayAdapter<OldMessage>{
     public View getView(int position, View convertView, ViewGroup parent) {
         View row;
         
-        OldMessage message = data.get(position);
+        Message message = data.get(position);
         
+        String sender = message.sender().publicKey().toString();
+
         int resourceId = message.isOwn() ? layoutUserResourceId : listContactResourceId;
         row = inflater.inflate(resourceId, parent, false);
         
@@ -42,22 +44,22 @@ public class ChatAdapter extends ArrayAdapter<OldMessage>{
         TextView messageTime = (TextView)row.findViewById(R.id.messageTime);
         
         messageContent.setText(message.content());
-        messageSender.setText(message.sender());
+		messageSender.setText(sender);
         if (message.isOwn()) {
         	View speechBubbleArrowRight = row.findViewById(R.id.speechBubbleArrowRight);
         	speechBubbleArrowRight.setBackground(new TriangleRightDrawable(Color.parseColor("#D34F39")));
         } else {
-        	messageSender.setTextColor(darkColorDeterminedBy(message.sender()));
+        	messageSender.setTextColor(darkColorDeterminedBy(sender));
         	
         	View speechBubbleArrowLeft = row.findViewById(R.id.speechBubbleArrowLeft);
-        	speechBubbleArrowLeft.setBackground(new TriangleLeftDrawable(darkColorDeterminedBy(message.sender())));
+        	speechBubbleArrowLeft.setBackground(new TriangleLeftDrawable(darkColorDeterminedBy(sender)));
         	
         	LayerDrawable bubbleLayer = (LayerDrawable) speechBubble.getBackground();
         	GradientDrawable bubbleBackground = (GradientDrawable) bubbleLayer.findDrawableByLayerId(R.id.bubbleBackground);
-        	bubbleBackground.setColor(lightColorDeterminedBy(message.sender()));
+        	bubbleBackground.setColor(lightColorDeterminedBy(sender));
         	
         	GradientDrawable bubbleShadow = (GradientDrawable) bubbleLayer.findDrawableByLayerId(R.id.bubbleShadow);
-        	bubbleShadow.setColor(darkColorDeterminedBy(message.sender()));
+        	bubbleShadow.setColor(darkColorDeterminedBy(sender));
         }
         
         messageTime.setText(message.time());
