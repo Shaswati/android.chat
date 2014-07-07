@@ -11,7 +11,7 @@ public interface Chat {
 	/** All Conversations you have had. */
 	Observable<Conversation> conversations();
 
-	/** @return a new or existing Conversation with party. */
+	/** @return an existing Conversation with party or a new one if it doesn't exist. */
 	Conversation produceConversationWith(Party party);
 
 }
