@@ -8,30 +8,31 @@ import android.annotation.*;
 
 public class Message {
 	
+	@SuppressLint("SimpleDateFormat")
+	private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("HH:mm");
+
 	private final String content;
 	private final Party sender;
 	
-	private final long timestamp;
+	private final long timestampSent;
+	private final long timestampReceived;
 	
 	
-	public Message(long timestamp, String content) {
-		this.timestamp = timestamp;
+	public Message(long timestampSent, String content) {
+		this.timestampSent = timestampSent;
+		this.timestampReceived = timestampSent;
 		this.sender = null;
 		this.content = content;
 	}
 	
 	
-	public Message(long timestamp, Party sender, String content) {
-		this.timestamp = timestamp;
+	public Message(long timestampSent, long timestampReceived, Party sender, String content) {
+		this.timestampSent = timestampSent;
+		this.timestampReceived = timestampReceived;
 		this.sender = sender;
 		this.content = content;
 	}
 
-	@SuppressLint("SimpleDateFormat")
-	public String time() {
-		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-		return sdf.format(new Date(timestamp));
-	}
 	
 	public boolean isOwn() {
 		return sender == null;
@@ -47,15 +48,27 @@ public class Message {
 		return content;
 	}
 	
+
+	/** When this message was sent. */
+	public long timestampSent() {
+		return timestampSent;
+	}
+
 	
-	public long timestamp() {
-		return timestamp;
+	/** When this message was received. */
+	public long timestampReceived() {
+		return timestampReceived;
 	}
 
 
+	public String timeSent() {
+		return SIMPLE_DATE_FORMAT.format(new Date(timestampSent));
+	}
+	
+	
 	@Override
 	public String toString() {
-		return "Message [" + timestamp + " " + sender + ": " + content + "]";
+		return "Message [" + timestampSent + " " + sender + ": " + content + "]";
 	}	
 	
 }

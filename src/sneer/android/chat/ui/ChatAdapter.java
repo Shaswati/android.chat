@@ -33,7 +33,7 @@ public class ChatAdapter extends ArrayAdapter<Message>{
         
         Message message = data.get(position);
         
-        String sender = message.sender().publicKey().toString();
+        String sender = message.sender().nickname().toBlockingObservable().first();
 
         int resourceId = message.isOwn() ? layoutUserResourceId : listContactResourceId;
         row = inflater.inflate(resourceId, parent, false);
@@ -62,7 +62,7 @@ public class ChatAdapter extends ArrayAdapter<Message>{
         	bubbleShadow.setColor(darkColorDeterminedBy(sender));
         }
         
-        messageTime.setText(message.time());
+        messageTime.setText(message.timeSent());
         
         return row;
     }

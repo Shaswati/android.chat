@@ -1,33 +1,43 @@
 package sneer.chat.simulator;
 
 import rx.*;
+import rx.subjects.ReplaySubject;
 import sneer.chat.*;
 
 public class ConversationSimulator implements Conversation {
-	
-	private Party party;
-	private String content;
 
+	private final ReplaySubject<Message> messages = ReplaySubject.create();
+
+	private Party party;
+
+	
 	public ConversationSimulator(Party party) {
 		this.party = party;
-		// TODO Auto-generated constructor stub
+		sendMessage("q festa!!!! uhuu!!!");
+		messages.onNext(new Message(now(), now(), this.party, "Onde? Onde??"));
 	}
 
+	
 	@Override
 	public Party party() {
-		return this.party;
+		return party;
 	}
 
+	
 	@Override
 	public Observable<Message> messages() {
-		// TODO Auto-generated method stub
-		return null;
+		return messages;
 	}
 
+	
 	@Override
 	public void sendMessage(String content) {
-		this.content = content;
-		
+		messages.onNext(new Message(now(), content));
+	}
+	
+	
+	static private long now() {
+		return System.currentTimeMillis();
 	}
 
 }
