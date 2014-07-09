@@ -40,4 +40,17 @@ public class ConversationSimulator implements Conversation {
 		return System.currentTimeMillis();
 	}
 
+
+	@Override
+	public long lastMessageTimestamp() {
+		return 0;
+	}
+
+
+	@Override
+	public Party party(Party party) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
