@@ -1,16 +1,21 @@
 package sneer.android.chat.ui;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-import rx.android.schedulers.*;
-import rx.functions.*;
-import sneer.chat.*;
-import sneer.chat.OldMessage;
-import android.app.*;
-import android.os.*;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import sneer.chat.Conversation;
+import sneer.chat.Message;
+import sneer.chat.util.Comparators;
+import android.app.Activity;
+import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.view.*;
-import android.widget.*;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 
 /**
@@ -30,6 +35,10 @@ public class ChatListFragment extends ListFragment {
 	 */
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
+	private static final Comparator<? super Conversation> BY_TIMESTAMP = new Comparator<Conversation>() { @Override public int compare(Conversation lhs, Conversation rhs) {
+		return Comparators.compare(lhs.lastMessageTimestamp(), rhs.lastMessageTimestamp());
+	}};
+	
 	/**
 	 * The fragment's current callback object, which is notified of list item
 	 * clicks.
@@ -41,8 +50,10 @@ public class ChatListFragment extends ListFragment {
 	 */
 	private int mActivatedPosition = ListView.INVALID_POSITION;
 	
-	private List<OldRoom> rooms = new ArrayList<OldRoom>();
-	private ArrayAdapter<OldRoom> contactsAdapter;
+	
+	
+	private List<Conversation> conversations = new ArrayList<Conversation>();
+	private ArrayAdapter<Conversation> conversationsAdapter;
 
 	/**
 	 * A callback interface that all activities containing this fragment must
@@ -53,7 +64,7 @@ public class ChatListFragment extends ListFragment {
 		/**
 		 * Callback for when an item has been selected.
 		 */
-		public void onItemSelected(OldRoom contact);
+		public void onItemSelected(Conversation conversation);
 	}
 
 	/**
@@ -62,7 +73,7 @@ public class ChatListFragment extends ListFragment {
 	 */
 	private static Callbacks sDummyCallbacks = new Callbacks() {
 		@Override
-		public void onItemSelected(OldRoom contact) {
+		public void onItemSelected(Conversation convesation) {
 		}
 	};
 
@@ -77,10 +88,10 @@ public class ChatListFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		contactsAdapter = new ArrayAdapter<OldRoom>(getActivity(),
+		conversationsAdapter = new ArrayAdapter<Conversation>(getActivity(),
 				android.R.layout.simple_list_item_activated_1,
-				android.R.id.text1, rooms);
-		setListAdapter(contactsAdapter);
+				android.R.id.text1, conversations);
+		setListAdapter(conversationsAdapter);
 		
 	}
 
@@ -127,7 +138,7 @@ public class ChatListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(rooms.get(position));
+		mCallbacks.onItemSelected(conversations.get(position));
 	}
 
 	@Override
@@ -151,13 +162,19 @@ public class ChatListFragment extends ListFragment {
 						: ListView.CHOICE_MODE_NONE);
 	}
 
-	public void addRom(OldRoom Room) {
-		if (!rooms.contains(Room)) {
-			rooms.add(Room);
-			Room.messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<OldMessage>() {@Override public void call(OldMessage msg) {
-				Collections.sort(rooms);
-				contactsAdapter.notifyDataSetChanged();
+
+	
+	
+	public void addConversation(Conversation conversation) {
+		if (!conversations.contains(conversation)) {
+			conversations.add(conversation);
+			conversation.messages().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Message>() {@Override public void call(Message msg) {
+				Collections.sort(conversations, BY_TIMESTAMP);
+				conversationsAdapter.notifyDataSetChanged();
 			}});
 		}
 	}
+	
+
+	
 }

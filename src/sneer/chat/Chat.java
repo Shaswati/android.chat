@@ -6,6 +6,7 @@ public interface Chat {
 
 	/** All Individual contacts that you have and all Groups you are a member of. */
 	Observable<Party> parties();
+	
 	Party findParty(String publicKey);
 
 	/** All Conversations you have had. */

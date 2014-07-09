@@ -1,17 +1,20 @@
 package sneer.android.chat.ui;
 
-import rx.android.schedulers.*;
-import rx.functions.*;
-import sneer.android.chat.*;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import sneer.android.chat.ChatApp;
 import sneer.android.chat.R;
-import sneer.chat.*;
-import sneer.snapi.*;
-import android.content.*;
-import android.os.*;
-import android.support.v4.app.*;
-import android.util.*;
-import android.view.*;
-import android.widget.*;
+import sneer.chat.Chat;
+import sneer.chat.Conversation;
+import sneer.chat.simulator.IndividualSimulator;
+import sneer.snapi.SneerUtils;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.widget.Toast;
 
 /**
  * This activity has different
@@ -41,18 +44,18 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	}
 
 	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.action_contacts)
-			chat().pickParty().subscribe(new Action1<Contact>() {
-				@Override
-				public void call(Contact contact) {
-					onItemSelected(chat().produceRoomWith(contact));
-				}
-			});
-
-		return true;
-	}
+//	@Override
+//	public boolean onOptionsItemSelected(MenuItem item) {
+//		if (item.getItemId() == R.id.action_contacts)
+//			chat().findParty().subscribe(new Action1<Party>() {
+//				@Override
+//				public void call(Party party) {
+//					onItemSelected(chat().produceConversationWith(party));
+//				}
+//			});
+//
+//		return true;
+//	}
 
 	
 	@Override
@@ -62,11 +65,26 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 
 		SneerUtils.showSneerInstallationMessageIfNecessary(this);
 
-		chat().rooms().observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Action1<OldRoom>() {
+		
+		
+		chat().conversations().observeOn(AndroidSchedulers.mainThread())
+		.subscribe(new Action1<Conversation>() {
+			@Override
+			public void call(Conversation conversation) {
+				IndividualSimulator member = new IndividualSimulator(Observable.from("0099f12"),Observable.from("joaozinho"),Observable.from("joao"));
+				
+				conversation.party(member);
+				chatListFragment.addConversation(conversation);
+			}
+		});
+		
+		
+		
+		chat().conversations().observeOn(AndroidSchedulers.mainThread())
+				.subscribe(new Action1<Conversation>() {
 					@Override
-					public void call(OldRoom room) {
-						chatListFragment.addRom(room);
+					public void call(Conversation conversation) {
+						chatListFragment.addConversation(conversation);
 					}
 				});
 
@@ -77,6 +95,9 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 			mTwoPane = true;
 			chatListFragment.setActivateOnItemClick(true);
 		}
+		
+		
+		
 	}
 
 	
@@ -87,11 +108,11 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	
 	/** Callback method from {@link ChatListFragment.Callbacks} indicating that the item with the given ID was selected. */
 	@Override
-	public void onItemSelected(OldRoom room) {
+	public void onItemSelected(Conversation conversation) {
 		if (mTwoPane) {
 			Bundle arguments = new Bundle();
 			arguments.putString(ChatDetailFragment.PARTY_PUK,
-					room.contactPublicKey());
+					conversation.party().publicKey().toBlockingObservable().first());
 			ChatDetailFragment fragment = new ChatDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
@@ -100,7 +121,7 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 		} else {
 			Intent detailIntent = new Intent(this, ChatDetailActivity.class);
 			detailIntent.putExtra(ChatDetailFragment.PARTY_PUK,
-					room.contactPublicKey());
+					conversation.party().publicKey().toBlockingObservable().first());
 			startActivity(detailIntent);
 		}
 	}
