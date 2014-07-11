@@ -20,14 +20,6 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="sneer.android.chat.ui.ChatListActivity"
-            android:label="@string/title_chat_list" >
-        </activity>
-        <activity
-            android:name="sneer.android.chat.ui.ChatDetailActivity"
-            android:label="@string/title_chat_detail" >
-        </activity>
-        <activity
             android:name="sneer.android.chat.MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
@@ -36,8 +28,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="sneer.android.chat.DummyActivity"
-            android:label="@string/title_activity_dummy" >
+            android:name="sneer.android.chat.ui.ChatListActivity"
+            android:label="@string/title_chat_list" >
+        </activity>        
+        <activity
+            android:name="sneer.android.chat.ui.ChatDetailActivity"
+            android:label="@string/title_chat_detail" >
             <intent-filter>
                 <action android:name="sneer.intent.action.CHAT_CONTACT" />
                 <category android:name="android.intent.category.DEFAULT" />
