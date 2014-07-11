@@ -121,6 +121,7 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 		} else {
 			Intent detailIntent = new Intent(this, ChatDetailActivity.class);
 			detailIntent.putExtra(ChatDetailFragment.PARTY_PUK,
+					
 					conversation.party().publicKey().toBlockingObservable().first());
 			startActivity(detailIntent);
 		}

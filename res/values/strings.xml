@@ -10,5 +10,8 @@
     <string name="title_chat_list">SneerChat</string>
     <string name="title_chat_detail">Chat Detail</string>
     <string name="action_group">Chat Group</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_dummy">DummyActivity</string>
 
 </resources>

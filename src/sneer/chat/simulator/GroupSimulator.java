@@ -7,6 +7,9 @@ import sneer.chat.Party;
 public class GroupSimulator implements Group {
 
 	private Observable<Party> members;
+	private Observable<String> name;
+	private Observable<String> nickname;
+	private Observable<String> publicKey;
 	
 	public GroupSimulator(){
 		
@@ -14,20 +17,17 @@ public class GroupSimulator implements Group {
 	
 	@Override
 	public Observable<String> publicKey() {
-		// TODO Auto-generated method stub
-		return null;
+		return publicKey;
 	}
 
 	@Override
 	public Observable<String> nickname() {
-		// TODO Auto-generated method stub
-		return null;
+		return nickname;
 	}
 
 	@Override
 	public Observable<String> name() {
-		// TODO Auto-generated method stub
-		return null;
+		return name;
 	}
 
 	@Override
