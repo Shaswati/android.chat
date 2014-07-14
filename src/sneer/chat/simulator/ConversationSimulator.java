@@ -32,7 +32,7 @@ public class ConversationSimulator implements Conversation {
 	
 	@Override
 	public void sendMessage(String content) {
-		messages.onNext(new Message(now(), content));
+		messages.onNext(new Message(now(), 0, party, content));
 	}
 	
 	

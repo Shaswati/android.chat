@@ -25,6 +25,8 @@ public class ChatSimulator implements Chat {
 		return first(parties.filter(new Func1<Party, Boolean>() { @Override public Boolean call(Party party) {
 			return first(party.publicKey()).equals(publicKey);
 		}}));
+		
+		//return findIndividualParty();
 	}
 
 
@@ -50,4 +52,9 @@ public class ChatSimulator implements Chat {
 		return observable.toBlockingObservable().first();
 	}
 
+	private Party findIndividualParty(){
+		//public IndividualSimulator(Observable<String> publicKey, Observable<String> nickname,Observable<String> name) {
+		return new IndividualSimulator(Observable.from("P00001"), Observable.from("Segunda-feira"), Observable.from("Quebra Pernas") );
+	}
+	
 }

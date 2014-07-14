@@ -109,6 +109,7 @@ public class ChatListActivity extends FragmentActivity implements ChatListFragme
 	/** Callback method from {@link ChatListFragment.Callbacks} indicating that the item with the given ID was selected. */
 	@Override
 	public void onItemSelected(Conversation conversation) {
+		
 		if (mTwoPane) {
 			Bundle arguments = new Bundle();
 			arguments.putString(ChatDetailFragment.PARTY_PUK,

@@ -17,12 +17,24 @@ public class Message {
 	private final long timestampSent;
 	private final long timestampReceived;
 	
+	private boolean isOwn = false;
+	
 	
 	public Message(long timestampSent, String content) {
 		this.timestampSent = timestampSent;
 		this.timestampReceived = timestampSent;
 		this.sender = null;
 		this.content = content;
+	}
+	
+	
+	public Message(long timestampSent, Party party, String content) {
+		this.timestampSent = timestampSent;
+		this.timestampReceived = timestampSent;
+		this.sender = party;
+		this.content = content;
+		
+		this.isOwn = true;
 	}
 	
 	
@@ -35,7 +47,7 @@ public class Message {
 
 	
 	public boolean isOwn() {
-		return sender == null;
+		return isOwn;
 	}
 	
 	
